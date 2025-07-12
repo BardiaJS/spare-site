@@ -49,13 +49,14 @@
 
 {{--  TODO: comments --}}
       <div class="list-group">
+        <p>Comments</p>
         <a href="#" class="list-group-item list-group-item-action"> <img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128" /> User 1 </a>
-        <a href="#" class="list-group-item list-group-item-action"> <img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128" /> User 2 </a>
-        <a href="#" class="list-group-item list-group-item-action"> <img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128" /> User 3 </a>
+      </div>
+      <div class="list-group">
+        <p>Hello</p>
+        <a href="#" class="list-group-item list-group-item-action"> <img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128" /> User 1 </a>
       </div>
     </div>
-      <div class="text-center" style="margin-bottom: 50px; margin-top: 5px;">
-          <a href="/" style="color: white" class="btn btn-dark btn-sm">Dashboard </a> 
-      </div>
+
 
 </x-layout>

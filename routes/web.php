@@ -3,6 +3,8 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
 use Illuminate\Support\Facades\Route;
@@ -44,3 +46,11 @@ Route::post('/set-profile/user/{user}' , [UserController::class, 'set_profile_us
 
 Route::post('/set-image-for-product-frorm/{product}' , [ProductController::class, 'set_product_image']);
 Route::get('/all-productions' , [ProductController::class,'get_all_productions']);
+
+Route::get('/single-product/product/{product}' , [ProductController::class, 'show_single_product']);
+
+Route::get('/show-all-comments/product/{product}' , [ProductController::class,'show_all_comments_of_product']);
+Route::post('/add-to-order/product/{product}' , [OrderController::class,'add_product_to_order']);
+
+Route::get('/comment-form/{product}' , [CommentController::class,'show_comment_form']);
+Route::post('/add-comment/product/{product}' , [CommentController::class, 'add_comment']);

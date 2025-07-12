@@ -24,4 +24,8 @@ class Customer extends Model
     public function comments():HasMany{
         return $this->hasMany(Comment::class ,'customer_id');
     }
+
+    public function orders():HasMany{
+        return $this->hasMany(Order::class ,'customer_id');
+    }
 }

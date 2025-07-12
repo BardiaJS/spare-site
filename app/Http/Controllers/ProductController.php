@@ -31,7 +31,7 @@ class ProductController extends Controller
             'title' => ['required'] ,
             'information' => ['required'],
             'value' => ['required'] ,
-            'vehicle' => ['required']
+            'vehicle' => ['required'] ,
         ]);
         $validated ['admin_id'] = Auth::user()->admin->id;
         $validated['brand_id'] = $brandId;
@@ -77,5 +77,12 @@ class ProductController extends Controller
         return view('list-all-productions', ['productions'=> $all_productions]);
     }
 
+    public function show_single_product(Product $product){
+        return view('single-product-page' , ['product'=> $product]);
+    }
 
+    public function show_all_comments_of_product(Product $product){
+        $comments = $product->comments;
+        return view ('all-comments-of-product' , ['comments' => $comments]);
+    }
 }

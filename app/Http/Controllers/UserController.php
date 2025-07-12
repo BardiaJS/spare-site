@@ -57,9 +57,11 @@ class UserController extends Controller
         $validated = $createProfileRequest->validated();
         $validated['user_id'] = $user->id;
         Profile::create($validated);
-        Customer::create([
-            'user_id' => $user->id
-        ]);
+        if(Auth::user()->role != "admin"){
+            Customer::create([
+                'user_id' => $user->id
+            ]); 
+        }
         return redirect('/')->with('success','Your profile successfully completed!');
     }
     public function logout(){

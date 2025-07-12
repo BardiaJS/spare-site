@@ -19,9 +19,12 @@
         <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">OurApp</a></h4>
 
         @auth
+
         <div class="flex-row my-3 my-md-0">
           <a href="#" class="text-white mr-2 header-search-icon" title="Search" data-toggle="tooltip" data-placement="bottom"><i class="fas fa-search"></i></a>
           <a href="/single-profile/user/{{Auth::user()->id}}" class="mr-2"><img title="My Profile" data-toggle="tooltip" data-placement="bottom" style="width: 32px; height: 32px; border-radius: 16px" src="{{auth()->user()->avatar_url  }}" /></a>
+          <a href="/" style="color: white" class="btn btn-dark btn-sm">Dashboard </a> 
+
           @if(Auth::user()->profile)
             @if(Auth::user()->role == "admin")
               @if(!(Auth::user()->admin))

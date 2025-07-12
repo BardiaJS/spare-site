@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -14,12 +15,13 @@ class Product extends Model
         'brand_id' , 
         'category_id' , 
         'title',
+        'information',
         'value' , 
         'vehicle'
     ];
 
     public function brand():BelongsTo{
-        return $this->belongsTo(Brand::class , 'product_id');
+        return $this->belongsTo(Brand::class , 'brand_id');
     }
 
     public function category(): BelongsTo{
@@ -38,5 +40,9 @@ class Product extends Model
             return asset('storage/' . $this->image->path);
         }
         return asset('default-image.png');
+    }
+
+    public function comments():HasMany{
+        return $this->hasMany(Comment::class ,'product_id');
     }
 }
