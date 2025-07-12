@@ -54,3 +54,7 @@ Route::post('/add-to-order/product/{product}' , [OrderController::class,'add_pro
 
 Route::get('/comment-form/{product}' , [CommentController::class,'show_comment_form']);
 Route::post('/add-comment/product/{product}' , [CommentController::class, 'add_comment']);
+
+Route::delete('/delete-comment/comment/{comment}' , [CommentController::class,'delete_comment']);
+Route::get('/edit-comment/form/{comment}' , [CommentController::class,'edit_comment_form']);
+Route::put('/edit-comment/comment/{comment}' , [CommentController::class,'edit_comment']);
