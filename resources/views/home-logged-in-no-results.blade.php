@@ -26,9 +26,8 @@
               <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
             </svg>
             add product</a>
-        @else
-          <p class="lead text-muted">You can see the list of spare parts via <a href="/all-productions">this link</a></p>
         @endif
+          <p class="lead text-muted">You can see the list of spare parts via <a href="/all-productions">this link</a></p>
       </div>
     </div>
 </x-layout>

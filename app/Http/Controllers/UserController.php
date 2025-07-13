@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Avatar;
 use App\Models\Profile;
 use App\Models\Customer;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Rules\IranianPostalCode;
 use App\Rules\IranianMobileNumber;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\ImageManager;
@@ -26,7 +28,12 @@ class UserController extends Controller
 
     public function showCorrectHomePage(){
         if(Auth::check()){
-            return view("home-logged-in-no-results");
+            $ban_user = DB::table('bans')->where('user_id', Auth::user()->id)->first();
+            if(!$ban_user){
+                return view("home-logged-in-no-results");
+            }else{
+                return view("ban-user-page");
+            }
         }else{
             return view("home-guest");
         }
@@ -71,7 +78,9 @@ class UserController extends Controller
 
 
     public function user_single_profile(User $user){
-        return view ('profile-users' , ['user'=> $user]);
+        $comments = $user->customer->comments;
+        $products_that_buy = Order::where('customer_id' , $user->customer->id)->get();
+        return view ('profile-users' , ['user'=> $user , 'comments' => $comments , 'products_that_buy' => $products_that_buy]);
     }
 
 

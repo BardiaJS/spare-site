@@ -46,7 +46,7 @@
         </form>
       </div>
       <div>
-      @if(Auth::user()->customer)
+      @if((bool)Auth::user()->customer)
         <form action="/add-to-order/product/{{$product->id  }}" method="POST">
           @csrf
           <button class="btn btn-primary" style="margin-top: 10px">Add to purchase box</button>

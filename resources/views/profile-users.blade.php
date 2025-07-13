@@ -47,14 +47,15 @@
 
 
 
-{{--  TODO: comments --}}
-      <div class="list-group">
+    <div class="list-group" style="text-align: center">
         <p>Comments</p>
-        <a href="#" class="list-group-item list-group-item-action"> <img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128" /> User 1 </a>
-      </div>
-      <div class="list-group">
-        <p>Hello</p>
-        <a href="#" class="list-group-item list-group-item-action"> <img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128" /> User 1 </a>
+        @if(count($comments)==0)
+          <p>No comments</p>
+        @else
+          @foreach ($comments as $comment)
+            <a href="" class="list-group-item list-group-item-action"> <img class="avatar-tiny" /> {{$comment->body}}</a>
+          @endforeach
+        @endif
       </div>
     </div>
 

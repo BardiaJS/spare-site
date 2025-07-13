@@ -58,3 +58,5 @@ Route::post('/add-comment/product/{product}' , [CommentController::class, 'add_c
 Route::delete('/delete-comment/comment/{comment}' , [CommentController::class,'delete_comment']);
 Route::get('/edit-comment/form/{comment}' , [CommentController::class,'edit_comment_form']);
 Route::put('/edit-comment/comment/{comment}' , [CommentController::class,'edit_comment']);
+Route::post('/ban-user/user/{user}' , [AdminController::class,'ban_user']);
+Route::delete('/unban-user/user/{user}' , [AdminController::class, 'unban_user']);

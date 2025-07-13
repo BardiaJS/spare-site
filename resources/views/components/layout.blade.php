@@ -22,7 +22,9 @@
 
         <div class="flex-row my-3 my-md-0">
           <a href="#" class="text-white mr-2 header-search-icon" title="Search" data-toggle="tooltip" data-placement="bottom"><i class="fas fa-search"></i></a>
-          <a href="/single-profile/user/{{Auth::user()->id}}" class="mr-2"><img title="My Profile" data-toggle="tooltip" data-placement="bottom" style="width: 32px; height: 32px; border-radius: 16px" src="{{auth()->user()->avatar_url  }}" /></a>
+          @if((bool)Auth::user()->profile)
+            <a href="/single-profile/user/{{Auth::user()->id}}" class="mr-2"><img title="My Profile" data-toggle="tooltip" data-placement="bottom" style="width: 32px; height: 32px; border-radius: 16px" src="{{auth()->user()->avatar_url  }}" /></a>
+          @endif
           <a href="/" style="color: white" class="btn btn-dark btn-sm">Dashboard </a> 
 
           @if(Auth::user()->profile)

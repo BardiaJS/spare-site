@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ban;
 use App\Models\User;
 use App\Models\Admin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -35,5 +38,18 @@ class AdminController extends Controller
 
         $admin->update($validated);
         return redirect('/')->with('success','Admin information updated successfully!');
+    }
+
+    public function ban_user(User $user){
+        $validated ['user_id'] = $user->id;
+        $validated['admin_id'] = Auth::user()->admin->id;
+
+        Ban::create($validated);
+        return back()->with('success','User banned successfully!');
+    }
+
+    public function unban_user(User $user){
+        DB::table('bans')->where('user_id', $user->id)->delete();
+        return back()->with('success', 'User unbanned successfully');
     }
 }
