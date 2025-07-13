@@ -43,7 +43,7 @@ class AdminController extends Controller
     public function ban_user(User $user){
         $validated ['user_id'] = $user->id;
         $validated['admin_id'] = Auth::user()->admin->id;
-
+        $validated['national_code'] = $user->profile->national_code;
         Ban::create($validated);
         return back()->with('success','User banned successfully!');
     }
@@ -51,5 +51,10 @@ class AdminController extends Controller
     public function unban_user(User $user){
         DB::table('bans')->where('user_id', $user->id)->delete();
         return back()->with('success', 'User unbanned successfully');
+    }
+
+    public function ban_list(){
+        $ban_list = Ban::all();
+        return view('ban-list', ['bans'=> $ban_list]);
     }
 }

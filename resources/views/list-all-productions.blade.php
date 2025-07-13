@@ -1,7 +1,8 @@
 <x-layout>
     @if(count($productions) == 0)
-    
-     <p class="m-0 small shadow-sm">No Production</p>
+    <div class="text-center" style="font-weight: bold; font-size: 20px;">
+      <p class="m-0 small shadow-sm">No Production</p>
+    </div> 
     @else
       <div class="list-group text-center" >
         @foreach ($productions as $product)
@@ -11,7 +12,11 @@
                <p><strong>Information: </strong>{{$product->information  }}</p>
                <p><strong>Value: </strong>{{$product->value  }}</p>
                <p><strong>Vehicle: </strong>{{$product->vehicle}}</p>
-               <button class="btn btn-primary">Add to purchase box</button>
+               @if((bool)Auth::user()->customer)
+                  <form action="/add-to-order/product/{{$product->id  }}" method="POST">
+                    <button class="btn btn-primary">Add to purchase box</button>
+                  </form>
+               @endif
                {{-- <a href="">
                 {{$product->brand->name}}
                </a> --}}

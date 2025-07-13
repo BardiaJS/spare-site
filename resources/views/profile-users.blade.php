@@ -48,12 +48,12 @@
 
 
     <div class="list-group" style="text-align: center">
-        <p>Comments</p>
+        <p style="font-weight: bold; font-size:20px ;">Comments</p>
         @if(count($comments)==0)
-          <p>No comments</p>
+          <p style="font-size: 10">No comments</p>
         @else
           @foreach ($comments as $comment)
-            <a href="" class="list-group-item list-group-item-action"> <img class="avatar-tiny" /> {{$comment->body}}</a>
+            <a href="/show-all-comments/product/{{ $comment->product->id }}'" class="list-group-item list-group-item-action"> <img class="avatar-tiny" /> <span style="font-size: 10">{{$comment->body}}</span></a>
           @endforeach
         @endif
       </div>

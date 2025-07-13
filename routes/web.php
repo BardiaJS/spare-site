@@ -60,3 +60,4 @@ Route::get('/edit-comment/form/{comment}' , [CommentController::class,'edit_comm
 Route::put('/edit-comment/comment/{comment}' , [CommentController::class,'edit_comment']);
 Route::post('/ban-user/user/{user}' , [AdminController::class,'ban_user']);
 Route::delete('/unban-user/user/{user}' , [AdminController::class, 'unban_user']);
+Route::get('/ban-list' , [AdminController::class, 'ban_list']);
