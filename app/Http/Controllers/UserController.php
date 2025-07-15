@@ -20,8 +20,9 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\CreateProfileRequest;
-
-
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 
 class UserController extends Controller
 {
@@ -157,5 +158,25 @@ class UserController extends Controller
 
         return back()->with('success', 'Avatar updated!');
 
+    }
+
+
+    public function search_by_user_input(Request $request){
+        $term = $request->input('term');
+        $products = Product::where('title', 'like', "%$term%")
+            ->orWhere('information', 'like', "%$term%")
+            ->orWhere("vehicle", 'like', "%$term%")->get(); 
+        return view('search-result', ['products'=> $products]);
+        // return "hello";
+    }
+
+    public function search_by_brand(Request $request , $term){
+        $products = Brand::where('name', 'like', "%$term%")->get();
+        return view('search-result', ['products'=> $products]);
+    }
+
+    public function search_by_category(Request $request , $term){
+        $products = Category::where('name', 'like', "%$term%")->get();
+        return view('search-result', ['products'=> $products]);
     }
 }

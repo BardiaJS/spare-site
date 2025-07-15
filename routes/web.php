@@ -61,3 +61,9 @@ Route::put('/edit-comment/comment/{comment}' , [CommentController::class,'edit_c
 Route::post('/ban-user/user/{user}' , [AdminController::class,'ban_user']);
 Route::delete('/unban-user/user/{user}' , [AdminController::class, 'unban_user']);
 Route::get('/ban-list' , [AdminController::class, 'ban_list']);
+Route::get('/search' , function(){
+    return view('search-bar-form');
+} );
+Route::get('/search-user-input/result' , [UserController::class, 'search_by_user_input']);
+Route::get('/search-brand/{term}/result' , [UserController::class, 'search_by_brand']);
+Route::get('/search-category/{term}/result' , [UserController::class, 'search_by_category']);
