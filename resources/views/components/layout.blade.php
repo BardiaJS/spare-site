@@ -89,7 +89,7 @@
      x-show="show"
      x-transition
      class="container container--narrow">
-    <div class="alert alert-success text-center">
+    <div class="alert text-center" style="background-color:#58A0C8; color:#113F67">
         {{ session('success') }}
     </div>
 </div>
