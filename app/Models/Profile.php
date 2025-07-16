@@ -9,7 +9,6 @@ class Profile extends Model
 {
     protected $fillable = [
         'user_id' , 
-        'national_code' , 
         'phone' , 
         'address' ,
         'postal_code'

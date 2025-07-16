@@ -35,7 +35,7 @@ class UserController extends Controller
             if(!$ban_user){
                 return view("logged-in-user.logged-in-user");
             }else{
-                return view("ban-user-page");
+                return view("banned-user.banned-user-page");
             }
         }else{
             return view("index.index");
@@ -65,7 +65,7 @@ class UserController extends Controller
     }
 
     public function show_complete_profile_form(User $user){
-        return view('complete-profile-form' , ['user'=> $user]);
+        return view('complete-profile.complete-profile-form' , ['user'=> $user]);
     }
 
     public function complete_profile(CreateProfileRequest $createProfileRequest , User $user){
@@ -86,26 +86,28 @@ class UserController extends Controller
 
 
     public function user_single_profile(User $user){
-        $comments = $user->customer->comments;
-        $products_that_buy = Order::where('customer_id' , $user->customer->id)->get();
-        return view ('profile-users' , ['user'=> $user , 'comments' => $comments , 'products_that_buy' => $products_that_buy]);
+        if($user->role != 'admin'){
+            $comments = $user->customer->comments;
+            $products_that_buy = Order::where('customer_id' , $user->customer->id)->get();
+            return view ('profile-user.profile-users' , ['user'=> $user , 'comments' => $comments , 'products_that_buy' => $products_that_buy]);
+        }else{
+            return view('profile-user.profile-users' , ['comments' => []]);
+        }
     }
 
 
     public function user_information_form(){
-        return view('user-information-form');
+        return view('user-information.user-information-form');
     }
 
     public function change_user_information(Request $request,  User $user){
         $validated_first_name_and_last_name_and_email = $request->validate([
             'first_name' => 'sometimes', 
             'last_name' => 'sometimes',
-            'email' => 'sometimes' , Rule::Unique('users' , 'email')
         ]);
         $user->update($validated_first_name_and_last_name_and_email);
 
         $validated_profile_information = $request->validate([
-            'phone' => 'sometimes' , new IranianMobileNumber , 
             'address' => 'sometimes' ,
             'postal_code' => 'sometimes' , new IranianPostalCode
         ]); 
@@ -116,7 +118,7 @@ class UserController extends Controller
     }
 
     public function user_password_form(User $user){
-        return view ('user-password-form');
+        return view ('user-password-form.user-password-form');
     }
 
     public function change_user_password(Request $request, User $user){
@@ -135,7 +137,7 @@ class UserController extends Controller
     }
 
     public function show_avatar_form(){
-        return view ('avatar-form');
+        return view ('avatar-form.avatar-form');
     }
 
     public function set_profile_user(Request $request, User $user){
@@ -168,22 +170,37 @@ class UserController extends Controller
     }
 
 
-    public function search_by_user_input(Request $request){
-        $term = $request->input('term');
-        $products = Product::where('title', 'like', "%$term%")
-            ->orWhere('information', 'like', "%$term%")
-            ->orWhere("vehicle", 'like', "%$term%")->get(); 
-        return view('search-result', ['products'=> $products]);
-        // return "hello";
+public function search_by_user_input(Request $request) {
+    $term = $request->input('term'); // Changed from 'search' to 'term'
+    
+    if(empty($term)) {
+        return redirect()->back()->with('error', 'Please enter a search term');
     }
 
-    public function search_by_brand(Request $request , $term){
-        $products = Brand::where('name', 'like', "%$term%")->get();
-        return view('search-result', ['products'=> $products]);
-    }
+    $products = Product::where('title', 'like', "%$term%")
+        ->orWhere('information', 'like', "%$term%")
+        ->orWhere("vehicle", 'like', "%$term%")
+        ->paginate(1); 
+    
+    return view('search-result.search-result', ['products' => $products]);
+}
 
-    public function search_by_category(Request $request , $term){
-        $products = Category::where('name', 'like', "%$term%")->get();
-        return view('search-result', ['products'=> $products]);
-    }
+public function search_by_brand($brandName) {
+    $products = Product::with('brand')
+        ->whereHas('brand', function($query) use ($brandName) {
+            $query->where('name', 'like', "%$brandName%");
+        })->paginate(1);
+    
+    return view('search-result.search-result', ['products' => $products]);
+}
+
+// Search Products by Category
+public function search_by_category($categoryName) {
+    $products = Product::with('category')
+        ->whereHas('category', function($query) use ($categoryName) {
+            $query->where('name', 'like', "%$categoryName%");
+        })->paginate(1);
+    
+    return view('search-result.search-result', ['products' => $products]);
+}
 }

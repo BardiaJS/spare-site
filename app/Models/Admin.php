@@ -9,6 +9,7 @@ class Admin extends Model
 {
     protected $fillable = [
         'user_id' ,
+        'national_code',
         'information' , 
         'age'
     ];

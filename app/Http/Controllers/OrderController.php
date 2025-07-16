@@ -14,6 +14,11 @@ class OrderController extends Controller
         $validated ['customer_id'] = Auth::user()->customer->id;
         $validated ['product_id'] = $product->id;
         Order::create($validated);
-        return redirect('/all-productions')->with('success','Added to purchases order successfully!');
+        return redirect('/shopping-cart')->with('success','Added to purchases order successfully!');
+    }
+
+    public function delete_from_order(Request $request , Product $product){
+        Order::where('product_id', $product->id)->delete();
+        return redirect('/shopping-cart')->with('success','The product had been deleted from your cart successfully!');
     }
 }

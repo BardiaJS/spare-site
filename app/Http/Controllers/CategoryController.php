@@ -10,7 +10,7 @@ class CategoryController extends Controller
 {
     //
     public function show_category_form(){
-        return view ('add-category-form');
+        return view ('add-category.add-category-form');
     }
 
     public function add_category(Request $request){
@@ -21,6 +21,5 @@ class CategoryController extends Controller
         // return $validated;
         Category::create($validated);
         return redirect('/')->with('success','New category added successfully!');
-
     }
 }

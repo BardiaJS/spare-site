@@ -45,4 +45,8 @@ class Product extends Model
     public function comments():HasMany{
         return $this->hasMany(Comment::class ,'product_id');
     }
+
+    public function orders():HasMany{
+        return $this->hasMany(Order::class ,'product_id');
+    }
 }

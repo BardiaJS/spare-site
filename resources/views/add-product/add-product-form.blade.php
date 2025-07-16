@@ -42,7 +42,7 @@
               @enderror
             </div>
             <div class="form-group">
-              <label for="iformation-register" class="text-muted mb-1"><small>Iformation</small></label>
+              <label for="iformation-register" class="text-muted mb-1"><small>Information</small></label>
               <input value="{{old('information')  }}" name="information" id="information-register" class="form-control" type="text" placeholder="information" autocomplete="off" />
               @error('information')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
@@ -65,9 +65,9 @@
               @enderror
             </div>
             @if (count($brands)>0 and count($categories) > 0)
-              <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #0ef5b0; ">Set Product</button>
+              <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #34699A; color: #FDF5AA; ">Set Product</button>
             @else
-              <button disabled type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #0ef5b0; ">Set Product</button>
+              <button disabled type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #34699A; color:#FDF5AA">Set Product</button>
             @endif
 
           </form>

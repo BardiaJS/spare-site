@@ -16,5 +16,9 @@ class Order extends Model
         return $this->belongsTo(Customer::class , 'customer_id');
     }
 
+    public function product():BelongsTo{
+        return $this->belongsTo(Product::class ,'product_id');
+    }
+
 
 }

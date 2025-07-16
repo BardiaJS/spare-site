@@ -14,7 +14,7 @@
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-            <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #0ef5b0; ">Save Changes</button>
+            <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #34699A; color: #FDF5AA; ">Save Changes</button>
           </form>
         </div>
         <div class="col-lg-3 py-3 py-md-5">

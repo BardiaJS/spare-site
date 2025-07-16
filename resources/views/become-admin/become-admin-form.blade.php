@@ -13,16 +13,15 @@
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-            <div class="form-group" style="height: 500px;">
-              <label for="information-register" class="text-muted mb-1"><small>information(Work Experience)</small></label>
-              <input value="{{old('information')}}" name="information" id="information-register" class="form-control" type="text" placeholder="Information" autocomplete="off" />
-
+            <div class="information">
+              <label style="text-align: left" for="information" class="text-muted mb-1"><small>information(Work Experience)</small></label>
+              <input style="text-align: left;" value="{{old('information')}}" name="information"  class="form-control" type="text" placeholder="Information" autocomplete="off" />
             </div>
             <div class="form-group">
               <label for="age-register" class="text-muted mb-1"><small>Age</small></label>
               <input name="age" id="age-register" class="form-control" type="number" min="0" max="100" placeholder="Age" />
             </div>
-            <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #0ef5b0; ">Set me seller</button>
+            <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #34699A; color: #FDF5AA; ">Set me seller</button>
           </form>
         </div>
         <div class="col-lg-3 py-3 py-md-5">

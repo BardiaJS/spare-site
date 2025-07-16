@@ -21,20 +21,7 @@
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-            <div class="form-group">
-              <label for="email-register" class="text-muted mb-1"><small>Email</small></label>
-              <input value="{{Auth::user()->email}}" name="email" id="email-register" class="form-control" type="text" placeholder="Email" autocomplete="off" />
-              @error('email')
-                <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
-              @enderror
-            </div>
-            <div class="form-group">
-              <label for="phone-register" class="text-muted mb-1"><small>Phone Number</small></label>
-              <input value="{{Auth::user()->profile->phone}}" name="phone" id="phone-register" class="form-control" type="text" placeholder="Phone Number" autocomplete="off" />
-              @error('phone')
-                <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
-              @enderror
-            </div>
+
             <div class="form-group">
               <label for="address-register" class="text-muted mb-1"><small>address</small></label>
               <input value="{{Auth::user()->profile->address}}" name="address" id="address-register" class="form-control" type="text" placeholder="Address" autocomplete="off" />
@@ -49,7 +36,7 @@
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-            <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #0ef5b0; ">Save Changes</button>
+            <button type="submit" class="py-3 mt-4 btn btn-lg btn-block" style="background-color: #34699A; color: #FDF5AA; ">Save Changes</button>
           </form>
         </div>
         <div class="col-lg-3 py-3 py-md-5">

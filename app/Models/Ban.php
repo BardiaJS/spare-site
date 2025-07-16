@@ -9,6 +9,6 @@ class Ban extends Model
     protected $fillable = [
         'user_id' ,
         'admin_id',
-        'national_code'
+        'email'
     ];
 }

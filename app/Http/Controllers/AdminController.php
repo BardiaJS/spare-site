@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
         public function become_admin_form(Request $request){
-        return view("become-admin-form");
+        return view("become-admin.become-admin-form");
     }
 
     public function become_admin(Request $request , User $user){
@@ -31,7 +31,7 @@ class AdminController extends Controller
     }
 
     public function admin_information_form(Admin $admin){
-        return view('admin-information-form');
+        return view('change-admin-information.admin-information-form');
     }
 
     public function change_admin_information(Request $request ,  Admin $admin){
@@ -46,7 +46,7 @@ class AdminController extends Controller
     public function ban_user(User $user){
         $validated ['user_id'] = $user->id;
         $validated['admin_id'] = Auth::user()->admin->id;
-        $validated['national_code'] = $user->profile->national_code;
+        $validated['email'] = $user->email;
         Ban::create($validated);
         return back()->with('success','User banned successfully!');
     }
@@ -57,7 +57,7 @@ class AdminController extends Controller
     }
 
     public function ban_list(){
-        $ban_list = Ban::all();
-        return view('ban-list', ['bans'=> $ban_list]);
+        $ban_list = Ban::paginate(1);
+        return view('ban-list.ban-list', ['bans'=> $ban_list]);
     }
 }

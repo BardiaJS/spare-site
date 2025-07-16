@@ -9,7 +9,7 @@
                     <p class="alert small alert-danger shadow-sm">{{$message}}</p>
                 @enderror
             </div>
-            <button  class="btn btn-primary">Save</button> 
+            <button  class="btn" style="background-color: #34699A; color: #FDF5AA;">Save</button> 
         </form>
     </div>
 </x-layout>
