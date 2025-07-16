@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>OurApp</title>
+    <title>Spare Site Sam</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
     <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,7 +16,7 @@
   <body>
     <header class="header-bar mb-3">
       <div class="container d-flex flex-column flex-md-row align-items-center p-3">
-        <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">OurApp</a></h4>
+        <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">Sam Spare Site</a></h4>
 
         @auth
 
@@ -25,23 +25,23 @@
           @if((bool)Auth::user()->profile)
             <a href="/single-profile/user/{{Auth::user()->id}}" class="mr-2"><img title="My Profile" data-toggle="tooltip" data-placement="bottom" style="width: 32px; height: 32px; border-radius: 16px" src="{{auth()->user()->avatar_url  }}" /></a>
           @endif
-          <a href="/" style="color: white" class="btn btn-dark btn-sm">Dashboard </a> 
+          <a href="/" style="color: #FDF5AA; background-color: #34699A;" class="btn btn-sm">Dashboard </a> 
 
           @if(Auth::user()->profile)
             @if(Auth::user()->role == "admin")
               @if(!(Auth::user()->admin))
-                <a class="btn btn-sm btn-success mr-2" href="/become-admin/{{Auth::user()->id}}">Admin detail Information</a>
+                <a class="btn btn-sm mr-2" style="background-color: #34699A; color: #FDF5AA;" href="/become-admin/{{Auth::user()->id}}">Admin detail Information</a>
               @elseif(Auth::user()->admin)
-                <a class="btn btn-sm btn-success mr-2" style="background-color: white;" @disabled(true)><strong style="color: rgb(109, 1, 1)">Admin:</strong> {{Auth::user()->first_name}}</a>
+                <a class="btn btn-sm btn-success mr-2" style="background-color: #FDF5AA;" @disabled(true)><strong style="color: rgb(109, 1, 1)">Admin:</strong> {{Auth::user()->first_name}}</a>
               @endif
             @endif
-            <a class="btn btn-sm mr-2" style="background-color: white;" @disabled(true)>You Completed Profile</a>
+            <a class="btn btn-sm mr-2" style="background-color: #FDF5AA; cursor:auto;" @disabled(true)>You Have Completed Profile</a>
           @else
-          <a class="btn btn-sm btn-success mr-2" href="/complete-profile-user/{{Auth::user()->id}}">Complete Profile</a>
+          <a class="btn btn-sm mr-2" style="background-color: #34699A; color: #FDF5AA;" href="/complete-profile-user/{{Auth::user()->id}}">Complete Profile</a>
           @endif
           <form action="/logout" method="POST" class="d-inline">
             @csrf
-            <button class="btn btn-sm btn-secondary">Sign Out</button>
+            <button class="btn btn-sm" style="background-color: #34699A; color:#FDF5AA">Sign Out</button>
           </form>
         </div>
         @else
@@ -56,7 +56,7 @@
                   <input name="password" class="form-control form-control-sm input-dark" type="password" placeholder="Password" />
                 </div>
                 <div class="col-md-auto">
-                  <button class="btn btn-primary btn-sm">Sign In</button>
+                  <button class="btn btn-sm" style="background-color: #34699A; color: #FDF5AA;">Sign In</button>
                 </div>
               </div>
         </form>

@@ -26,7 +26,6 @@ class CreateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'national_code' => ['required' , Rule::unique('profiles' , 'national_code') , new IranianNationalCode] ,
             'phone' => ['required', Rule::unique('profiles','phone') , new IranianMobileNumber] ,
             'address' => ['required'],
             'postal_code' => ['required' , new IranianPostalCode]

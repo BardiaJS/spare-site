@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Ban;
 use App\Models\User;
 use App\Models\Admin;
+use App\Rules\IranianNationalCode;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -17,6 +19,7 @@ class AdminController extends Controller
 
     public function become_admin(Request $request , User $user){
         $validated = $request->validate([
+            'national_code' => ['required' , Rule::unique('admins' , 'national_code') , new IranianNationalCode],
             'information' => ['required'],
             'age' => ['required'],
         ]);

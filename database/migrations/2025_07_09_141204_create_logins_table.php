@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('logins', function (Blueprint $table) {
             $table->id();
-            $table->string('customer_id');
-            $table->string('product_id');
-            $table->string('value');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('last_time_login');
             $table->timestamps();
         });
     }

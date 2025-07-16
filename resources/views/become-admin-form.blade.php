@@ -6,9 +6,16 @@
         <div class="col-lg-5 pl-lg-5 pb-3 py-lg-5">
           <form action="/become-admin/{{Auth::user()->id}}" method="POST" id="registration-form">
             @csrf
+            <div class="form-group">
+              <label for="national-code-register" class="text-muted mb-1"><small>National Code</small></label>
+              <input value="{{old('national_code')}}" name="national_code" id="national-code-register" class="form-control" type="text" placeholder="National Code" autocomplete="off" />
+              @error('national_code')
+                <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
+              @enderror
+            </div>
             <div class="form-group" style="height: 500px;">
               <label for="information-register" class="text-muted mb-1"><small>information(Work Experience)</small></label>
-              <input value="{{old('information')}}" name="information" id="information-register" class="form-control" type="text" placeholder="Information" style="height: 400px; text-align:left;" autocomplete="off" />
+              <input value="{{old('information')}}" name="information" id="information-register" class="form-control" type="text" placeholder="Information" autocomplete="off" />
 
             </div>
             <div class="form-group">

@@ -75,4 +75,8 @@ class User extends Authenticatable
         }
         return asset('default-avatar.png');
     }
+
+    public function login(): HasOne{
+        return $this->hasOne(Login::class,'user_id');
+    }
 }

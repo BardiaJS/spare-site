@@ -8,7 +8,7 @@
         <input type="text" 
             id="searchInput"
             name="search"
-            class="form-control ps-5" 
+            class="form-control" 
             placeholder="Search products..."
             value="{{ request('search') }}"
             style="margin-left: 10px">

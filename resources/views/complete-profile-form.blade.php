@@ -6,13 +6,7 @@
         <div class="col-lg-5 pl-lg-5 pb-3 py-lg-5">
           <form action="/complete-profile-user/{{Auth::user()->id}}" method="POST" id="registration-form">
             @csrf
-            <div class="form-group">
-              <label for="national-code-register" class="text-muted mb-1"><small>National Code</small></label>
-              <input value="{{old('national_code')}}" name="national_code" id="national-code-register" class="form-control" type="text" placeholder="National Code" autocomplete="off" />
-              @error('national_code')
-                <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
-              @enderror
-            </div>
+
             <div class="form-group">
               <label for="phone-register" class="text-muted mb-1"><small>Phone Number</small></label>
               <input value="{{old('phone')  }}" name="phone" id="phone-register" class="form-control" type="text" placeholder="Phone Number" autocomplete="off" />

@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Brand;
+use App\Models\Login;
 use App\Models\Order;
 use App\Models\Avatar;
+use App\Models\Product;
 use App\Models\Profile;
+use App\Models\Category;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -20,9 +25,6 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\CreateProfileRequest;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Product;
 
 class UserController extends Controller
 {
@@ -31,12 +33,12 @@ class UserController extends Controller
         if(Auth::check()){
             $ban_user = DB::table('bans')->where('user_id', Auth::user()->id)->first();
             if(!$ban_user){
-                return view("home-logged-in-no-results");
+                return view("logged-in-user.logged-in-user");
             }else{
                 return view("ban-user-page");
             }
         }else{
-            return view("home-guest");
+            return view("index.index");
         }
     }
     public function register(UserRegisterRequest $userRegisterRequest){
@@ -44,6 +46,9 @@ class UserController extends Controller
         $validated ['password'] = bcrypt($validated['password']);
         $user =User::create($validated);
         Auth::login($user);
+        $login_create_data ['user_id'] =Auth::user()->id;
+        $login_create_data ['last_time_login'] =(string) Carbon::now();
+        Login::create($login_create_data);
         return redirect('/')->with('success','You have successfully registered!');
     }
 
@@ -51,6 +56,8 @@ class UserController extends Controller
         $validated = $userLoginRequest->validated();    
         if(Auth::attempt($validated)){
             $userLoginRequest->session()->regenerate();
+            $data['last_time_login'] = Carbon::now();
+            Auth::user()->login->update($data);
             return redirect('/')->with('success','You have successfully logged in!');
         }else{
             return redirect('/')->with('error','There was invalid data!');
