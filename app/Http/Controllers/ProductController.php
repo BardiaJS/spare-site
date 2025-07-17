@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\Image;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
@@ -95,6 +96,13 @@ class ProductController extends Controller
         ->select('products.*') // or select specific columns
         ->paginate(1);
 
-        return view('shopping-cart.shopping-cart', ['productions' => $products]);
+
+$totalValue = Order::where('customer_id', $customerId)
+    ->join('products', 'orders.product_id', '=', 'products.id')
+    ->sum('products.value');
+
+        // dd($totalValue);
+
+        return view('shopping-cart.shopping-cart', ['productions' => $products , 'fee' => $totalValue]);
     }
 }

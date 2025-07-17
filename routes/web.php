@@ -51,7 +51,7 @@ Route::get('/single-product/product/{product}' , [ProductController::class, 'sho
 
 Route::get('/show-all-comments/product/{product}' , [ProductController::class,'show_all_comments_of_product'])->middleware('auth');
 Route::post('/add-to-order/product/{product}' , [OrderController::class,'add_product_to_order'])->middleware('auth');
-Route::delete('/delete-from-order/product/{product}' , [OrderController::class, 'delete_from_order' ])->middleware('auth');
+Route::delete('/delete-from-order/order/{order}' , [OrderController::class, 'delete_from_order' ])->middleware('auth');
 
 Route::get('/comment-form/{product}' , [CommentController::class,'show_comment_form'])->middleware('auth');
 Route::post('/add-comment/product/{product}' , [CommentController::class, 'add_comment'])->middleware('auth');

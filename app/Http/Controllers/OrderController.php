@@ -17,8 +17,8 @@ class OrderController extends Controller
         return redirect('/shopping-cart')->with('success','Added to purchases order successfully!');
     }
 
-    public function delete_from_order(Request $request , Product $product){
-        Order::where('product_id', $product->id)->delete();
+    public function delete_from_order(Request $request , Order $order){
+        $order->delete();
         return redirect('/shopping-cart')->with('success','The product had been deleted from your cart successfully!');
     }
 }

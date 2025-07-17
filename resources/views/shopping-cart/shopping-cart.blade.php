@@ -5,9 +5,7 @@
     </div> 
     @else
       <div class="list-group text-center" >
-        <?php 
-            $fee =0;
-        ?>
+
         @foreach ($productions as $product)
 
             <a href="/single-product/product/{{$product->id}}" class="list-group-item list-group-item-action">
@@ -41,7 +39,7 @@
                 </svg>
                 Vehicle: </strong> <span style="color: #58A0C8; font-weight: bold; font-size: 18px;">{{$product->vehicle}}</span></p>
                @if((bool)Auth::user()->customer)
-                  <form action="/delete-from-order/product/{{$product->id}}" method="POST">
+                  <form action="/delete-from-order/order/{{$product->orders->first()->id}}" method="POST">
                     @csrf
                     @method("DELETE")
                     <button class="btn" style="background-color: #113F67; color: #FDF5AA;">
@@ -52,13 +50,11 @@
                     </button>
                   </form>
                @endif
-                <?php
-                    $fee += (int) ($product->value)
-                ?>
+
 
                {{-- <a href="">
                 {{$product->brand->name}}
-               </a> --}}
+               </a> --}} 
                
               </a>
         @endforeach
