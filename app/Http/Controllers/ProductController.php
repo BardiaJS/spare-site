@@ -84,16 +84,16 @@ class ProductController extends Controller
     }
 
     public function show_all_comments_of_product(Product $product){
-        $comments = $product->comments->paginate(1);
+        $comments = $product->comments()->paginate(1);
         return view ('all-comments.all-comments-of-product' , ['comments' => $comments]);
     }
 // 
     public function show_shopping_cart (){
-            $products = Product::whereHas('orders', function($query) {
-            $query->where('customer_id', Auth::user()->customer->id);
-        })
-        ->with(['image', 'brand', 'category']) // eager load relationships
-        ->paginate(1); // paginate with 10 items per page
+        $customerId = Auth::user()->customer->id;
+        $products = Product::join('orders', 'products.id', '=', 'orders.product_id')
+        ->where('orders.customer_id', $customerId)
+        ->select('products.*') // or select specific columns
+        ->paginate(1);
 
         return view('shopping-cart.shopping-cart', ['productions' => $products]);
     }

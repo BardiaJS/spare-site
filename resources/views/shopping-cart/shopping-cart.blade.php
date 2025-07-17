@@ -6,7 +6,7 @@
     @else
       <div class="list-group text-center" >
         <?php 
-            $fee = 0;
+            $fee =0;
         ?>
         @foreach ($productions as $product)
 
@@ -53,7 +53,7 @@
                   </form>
                @endif
                 <?php
-                    $fee += $product->value
+                    $fee += (int) ($product->value)
                 ?>
 
                {{-- <a href="">
@@ -62,7 +62,7 @@
                
               </a>
         @endforeach
-        {{$productions->links()  }}
+        {{$productions->links()}}
                        <div class="text-center" style="margin-top: 10px">
 
                 <span style="color: #113F67; font-size:20px; font-weight: bold;" >Final Fee: {{$fee}} T</span>
