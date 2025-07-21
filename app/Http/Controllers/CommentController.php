@@ -11,7 +11,7 @@ class CommentController extends Controller
 {
     //
     public function show_comment_form(Product $product){
-        return view('comment-form.comment-form' , ['product' => $product]);
+        return view('comment-form' , ['product' => $product]);
     }
     public function add_comment(Request $request , Product $product){
         $validated = $request->validate([
@@ -32,7 +32,7 @@ class CommentController extends Controller
     }
 
     public function edit_comment_form(Comment $comment){
-        return view("edit-comment.edit-comment-form" , ["comment"=> $comment]);
+        return view("edit-comment-form" , ["comment"=> $comment]);
     }
 
     public function edit_comment (Request $request , Comment $comment){

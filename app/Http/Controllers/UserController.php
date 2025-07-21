@@ -33,12 +33,12 @@ class UserController extends Controller
         if(Auth::check()){
             $ban_user = DB::table('bans')->where('user_id', Auth::user()->id)->first();
             if(!$ban_user){
-                return view("logged-in-user.logged-in-user");
+                return view("logged-in-user");
             }else{
-                return view("banned-user.banned-user-page");
+                return view("banned-user-page");
             }
         }else{
-            return view("index.index");
+            return view("index");
         }
     }
     public function register(UserRegisterRequest $userRegisterRequest){
@@ -65,7 +65,7 @@ class UserController extends Controller
     }
 
     public function show_complete_profile_form(User $user){
-        return view('complete-profile.complete-profile-form' , ['user'=> $user]);
+        return view('complete-profile-form' , ['user'=> $user]);
     }
 
     public function complete_profile(CreateProfileRequest $createProfileRequest , User $user){
@@ -89,15 +89,15 @@ class UserController extends Controller
         if($user->role != 'admin'){
             $comments = $user->customer->comments;
             $products_that_buy = Order::where('customer_id' , $user->customer->id)->get();
-            return view ('profile-user.profile-users' , ['user'=> $user , 'comments' => $comments , 'products_that_buy' => $products_that_buy]);
+            return view ('profile-users' , ['user'=> $user , 'comments' => $comments , 'products_that_buy' => $products_that_buy]);
         }else{
-            return view('profile-user.profile-users' , ['comments' => []]);
+            return view('profile-users' , ['comments' => []]);
         }
     }
 
 
     public function user_information_form(){
-        return view('user-information.user-information-form');
+        return view('user-information-form');
     }
 
     public function change_user_information(Request $request,  User $user){
@@ -118,7 +118,7 @@ class UserController extends Controller
     }
 
     public function user_password_form(User $user){
-        return view ('user-password-form.user-password-form');
+        return view ('user-password-form');
     }
 
     public function change_user_password(Request $request, User $user){
@@ -137,37 +137,50 @@ class UserController extends Controller
     }
 
     public function show_avatar_form(){
-        return view ('avatar-form.avatar-form');
+        return view ('avatar-form');
     }
 
-    public function set_profile_user(Request $request, User $user){
-        $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+    public function set_profile_user(Request $request, User $user)
+{
+    $request->validate([
+        'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
 
-        // Delete old avatar if exists
+    try {
+        // بررسی وجود فایل
+        if (!$request->hasFile('avatar')) {
+            return back()->with('error', "Didn't choose the picture!");
+        }
+
+        // حذف آواتار قدیمی
         if ($user->avatar && Storage::disk('public')->exists($user->avatar->path)) {
             Storage::disk('public')->delete($user->avatar->path);
         }
 
-        // Process new image
+        // پردازش تصویر جدید
         $manager = new ImageManager(new Driver());
         $image = $manager->read($request->file('avatar'));
-        $image->cover(200, 200); // Square avatar
+        $image->cover(200, 200);
 
         $filename = 'avatars/user-' . $user->id . '-' . uniqid() . '.jpg';
         
-        Storage::disk('public')->put($filename, $image->toJpeg(80));
+        // ذخیره تصویر با بررسی نتیجه
+        if (!Storage::disk('public')->put($filename, $image->toJpeg(80))) {
+            throw new \Exception('Failed to save file');
+        }
 
-        // Update or create avatar
-        Avatar::updateOrCreate(
+        // استفاده از رابطه مدل
+        $user->avatar()->updateOrCreate(
             ['user_id' => $user->id],
             ['path' => $filename]
         );
 
-        return back()->with('success', 'Avatar updated!');
+        return back()->with('success', "Avatar uploades successfully!");
 
+    } catch (\Exception $e) {
+        return back()->with('error', "Error in uploading: " . $e->getMessage());
     }
+}
 
 
 public function search_by_user_input(Request $request) {
@@ -182,25 +195,25 @@ public function search_by_user_input(Request $request) {
         ->orWhere("vehicle", 'like', "%$term%")
         ->paginate(1); 
     
-    return view('search-result.search-result', ['products' => $products]);
+    return view('search-result', ['products' => $products]);
 }
 
-public function search_by_brand($brandName) {
-    $products = Product::with('brand')
-        ->whereHas('brand', function($query) use ($brandName) {
-            $query->where('name', 'like', "%$brandName%");
-        })->paginate(1);
-    
-    return view('search-result.search-result', ['products' => $products]);
-}
+    public function search_by_brand($brandName) {
+        $products = Product::with('brand')
+            ->whereHas('brand', function($query) use ($brandName) {
+                $query->where('name', 'like', "%$brandName%");
+            })->paginate(1);
+        
+        return view('search-result', ['products' => $products]);
+    }
 
 // Search Products by Category
-public function search_by_category($categoryName) {
-    $products = Product::with('category')
-        ->whereHas('category', function($query) use ($categoryName) {
-            $query->where('name', 'like', "%$categoryName%");
-        })->paginate(1);
-    
-    return view('search-result.search-result', ['products' => $products]);
-}
+    public function search_by_category($categoryName) {
+        $products = Product::with('category')
+            ->whereHas('category', function($query) use ($categoryName) {
+                $query->where('name', 'like', "%$categoryName%");
+            })->paginate(1);
+        
+        return view('search-result', ['products' => $products]);
+    }
 }

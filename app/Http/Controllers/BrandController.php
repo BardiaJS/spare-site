@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 class BrandController extends Controller
 {
     public function add_brand_form(){
-        return view('add-brand.add-brand-from');
+        return view('add-brand-from');
     }
     public function add_brand(Request $request){
         $validated = $request->validate([

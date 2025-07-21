@@ -63,7 +63,7 @@ Route::post('/ban-user/user/{user}' , [AdminController::class,'ban_user'])->midd
 Route::delete('/unban-user/user/{user}' , [AdminController::class, 'unban_user'])->middleware('auth');
 Route::get('/ban-list' , [AdminController::class, 'ban_list'])->middleware('auth');
 Route::get('/search' , function(){
-    return view('search-bar-form.search-bar-form');
+    return view('search-bar-form');
 } )->middleware('auth');
 Route::get('/search-user-input/result' , [UserController::class, 'search_by_user_input'])->middleware('auth');
 Route::get('/search-brand/{brandName}/result' , [UserController::class, 'search_by_brand'])->middleware('auth');
