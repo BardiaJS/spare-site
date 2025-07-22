@@ -1,12 +1,12 @@
 <x-layout>
     @if(count($comments) == 0)
-        <p class="text-center" style="color: #113F67">no comments</p>
+        <p class="text-center" style="color: #113F67">هیچ نظری وجود ندارد</p>
     @else
         @foreach ($comments as $comment)
         <div class="text-center">
             <img style="width: 50px; height: 50px;" src="{{$comment->customer->user->avatar_url}}">
             <br>
-            <span style="color: #34699A; font-weight: bold; font-size: 18px;">{{$comment->customer->user->first_name}} {{$comment->customer->user->last_name}} </span> says:
+            <span style="color: #34699A; font-weight: bold; font-size: 18px;">{{$comment->customer->user->first_name}} {{$comment->customer->user->last_name}} </span> میگوید:
             <p style="font-size: 20px; color: #113F67; font-weight: bold; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"> "{{$comment->body}}"</p>
             <div style="display: flex; text-align: center; justify-content: center; align-items: center; padding: 10px;">
 

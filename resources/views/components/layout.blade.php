@@ -17,35 +17,38 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('main.css') }}" />
   </head>
   <body>
     <header class="header-bar mb-3">
       <div class="container d-flex flex-column flex-md-row align-items-center p-3">
         
-        <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">Sam Spare Site</a></h4>
+        <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">سایت یدکی سم</a></h4>
         @auth
           <div class="flex-row my-3 my-md-0">
-            <a href="/search" class="text-white mr-2 header-search-icon"  title="Search" data-toggle="tooltip" data-placement="bottom"><i class="fas fa-search"></i></a>
+            <a href="/search" class="text-white mr-2 header-search-icon"  title="جست و جو" data-toggle="tooltip" data-placement="bottom"><i class="fas fa-search"></i></a>
             @if((bool)Auth::user()->profile)
-              <a href="/single-profile/user/{{Auth::user()->id}}" class="mr-2"><img class="profile-image" title="My Profile" data-toggle="tooltip" data-placement="bottom"  src="{{auth()->user()->avatar_url}}" /></a>
+              <a href="/single-profile/user/{{Auth::user()->id}}" class="mr-2"><img class="profile-image" title="پروفایل" data-toggle="tooltip" data-placement="bottom"  src="{{auth()->user()->avatar_url}}" /></a>
             @endif
-            <a href="/"class="btn btn-sm btn-animated mr-2">Dashboard </a> 
+            <a href="/"class="btn btn-sm btn-animated mr-2">داشبورد </a> 
             @if(Auth::user()->profile)
               @if(Auth::user()->role == "admin")
                 @if(!(Auth::user()->admin))
-                  <a class="btn btn-sm btn-animated mr-2" href="/become-admin/{{Auth::user()->id}}">Admin detail Information</a>
+                  <a class="btn btn-sm btn-animated mr-2" href="/become-admin/{{Auth::user()->id}}">اطلاعات ادمین</a>
                 @elseif(Auth::user()->admin)
-                  <a class="btn btn-sm btn-animated mr-2 disabled" ><strong>Admin:</strong><span> {{Auth::user()->first_name}} </span></a>
+                  <a class="btn btn-sm btn-animated mr-2 disabled" ><strong>ادمین:</strong><span> {{Auth::user()->first_name}} </span></a>
                 @endif
               @endif
-              <a class="btn btn-sm btn-animated mr-2 disabled">You Have Completed Profile</a>
+              <a class="btn btn-sm btn-animated mr-2 disabled">پروفایل تکمیل شده است</a>
             @else
-              <a class="btn btn-sm btn-animated mr-2"  href="/complete-profile-user/{{Auth::user()->id}}">Complete Profile</a>
+              <a class="btn btn-sm btn-animated mr-2"  href="/complete-profile-user/{{Auth::user()->id}}">کامل کردن پروفایل</a>
             @endif
             <form action="/logout" method="POST" class="d-inline">
               @csrf
-              <button class="btn btn-sm btn-animated mr-2">Sign Out</button>
+              <button class="btn btn-sm btn-animated mr-2">خروج</button>
             </form>
             @php
               $isBanned = \App\Models\Ban::where('user_id', Auth::user()->id)->exists();
@@ -78,14 +81,14 @@
             @csrf
               <div class="row align-items-center">
                 <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
-                  <input name="email" class="form-control form-control-sm input-dark" type="text" placeholder="email" autocomplete="off" />
+                  <input name="email" class="form-control form-control-sm input-dark" type="text" placeholder="ایمیل" autocomplete="off" />
                                     
                 </div>
                 <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
-                  <input name="password" class="form-control form-control-sm input-dark" type="password" placeholder="Password" />
+                  <input name="password" class="form-control form-control-sm input-dark" type="password" placeholder="رمز عبور" />
                 </div>
                 <div class="col-md-auto">
-                  <button class="btn btn-sm btn-animated mr-2" >Sign In</button>
+                  <button class="btn btn-sm btn-animated mr-2" >ورود</button>
                 </div>
               </div>
           </form>

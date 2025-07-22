@@ -7,13 +7,13 @@
           <form action="/add-category" method="POST" id="registration-form">
             @csrf
             <div class="form-group">
-              <label for="category-code-register" class="text-muted mb-1"><small>Category Name</small></label>
-              <input name="name" id="category-code-register" class="form-control" type="text" placeholder="Category" autocomplete="off" />
+              <label for="category-code-register" class="text-muted mb-1"><small>اسم دسته بندی</small></label>
+              <input name="name" id="category-code-register" class="form-control" type="text" placeholder="اسم دسته بندی" autocomplete="off" />
               @error('name')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-          <button type="submit" class="btn btn-sm btn-animated mr-2">Add Category</button>
+          <button type="submit" class="btn btn-sm btn-animated mr-2">اضافه کردن دسته بندی</button>
           </form>
         </div>
         <div class="col-lg-3 py-3 py-md-5">

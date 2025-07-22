@@ -1,9 +1,8 @@
 body{
-  font-family: "Winky Rough";
+  font-family: "Noto Sans Arabic";
   background: url('spare.png');
   background-repeat: no-repeat, repeat;
   background-position: center;
-  overflow: hidden;
   background-size:cover;
 }
 

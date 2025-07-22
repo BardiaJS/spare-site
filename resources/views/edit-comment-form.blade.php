@@ -8,13 +8,13 @@
             @csrf
             @method('PUT')
             <div class="form-group">
-              <label for="category-code-register" class="text-muted mb-1"><small>Comment</small></label>
-              <input value="{{$comment->body}}" name="body" id="category-code-register" class="form-control" type="text" placeholder="Category" autocomplete="off" />
+              <label for="category-code-register" class="text-muted mb-1"><small>نظر</small></label>
+              <input value="{{$comment->body}}" name="body" id="category-code-register" class="form-control" type="text" placeholder="نظر" autocomplete="off" />
               @error('body')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-            <button type="submit" class="btn btn-sm btn-animated mr-2">Change Comment</button>
+            <button type="submit" class="btn btn-sm btn-animated mr-2">تغییر نظر</button>
           </form>
         </div>
         <div class="col-lg-3 py-3 py-md-5">

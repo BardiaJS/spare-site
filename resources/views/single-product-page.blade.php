@@ -12,7 +12,7 @@
                 <path d="M3.5 2A1.5 1.5 0 0 0 2 3.5v11A1.5 1.5 0 0 0 3.5 16h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 16 9.586V3.5A1.5 1.5 0 0 0 14.5 2zM3 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V9h-4.5A1.5 1.5 0 0 0 9 10.5V15H3.5a.5.5 0 0 1-.5-.5zm7 11.293V10.5a.5.5 0 0 1 .5-.5h4.293z"/>
               </svg>
               
-              Title:</p>
+              تایتل:</p>
             <span style="color: #58A0C8; font-size: 17px;">{{ $product->title}}</span>
         </div>
         <div style="padding: 5px;">
@@ -21,7 +21,7 @@
               <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
             </svg>
               
-              Information:</p>
+              اطلاعات:</p>
             <span style="color: #58A0C8; font-size: 17px;">{{ $product->information}}</span>
         </div>
         <div style="padding: 5px; justify-content: center; align-items: center;">
@@ -30,7 +30,7 @@
                 <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73z"/>
               </svg>
               
-              Value:</p>
+              قیمت:</p>
             <span style="color: #58A0C8; font-size: 17px;">{{ $product->value}}</span>
         </div>
         <div style="padding: 5px;">
@@ -40,7 +40,7 @@
               <path d="M2.52 3.515A2.5 2.5 0 0 1 4.82 2h6.362c1 0 1.904.596 2.298 1.515l.792 1.848c.075.175.21.319.38.404.5.25.855.715.965 1.262l.335 1.679q.05.242.049.49v.413c0 .814-.39 1.543-1 1.997V13.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1.338c-1.292.048-2.745.088-4 .088s-2.708-.04-4-.088V13.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1.892c-.61-.454-1-1.183-1-1.997v-.413a2.5 2.5 0 0 1 .049-.49l.335-1.68c.11-.546.465-1.012.964-1.261a.8.8 0 0 0 .381-.404l.792-1.848ZM4.82 3a1.5 1.5 0 0 0-1.379.91l-.792 1.847a1.8 1.8 0 0 1-.853.904.8.8 0 0 0-.43.564L1.03 8.904a1.5 1.5 0 0 0-.03.294v.413c0 .796.62 1.448 1.408 1.484 1.555.07 3.786.155 5.592.155s4.037-.084 5.592-.155A1.48 1.48 0 0 0 15 9.611v-.413q0-.148-.03-.294l-.335-1.68a.8.8 0 0 0-.43-.563 1.8 1.8 0 0 1-.853-.904l-.792-1.848A1.5 1.5 0 0 0 11.18 3z"/>
             </svg>
               
-              Vehicle:</p>
+              وسیله نقلیه:</p>
             <span style="color: #58A0C8; font-size: 17px;">{{ $product->vehicle}}</span>
         </div>
       </h2>
@@ -56,7 +56,7 @@
                 <path d="M3.56 11V7.01h.056l1.428 3.239h.774l1.42-3.24h.056V11h1.073V5.001h-1.2l-1.71 3.894h-.039l-1.71-3.894H2.5V11z"/>
               </svg>
               
-              Brand:</p>
+              برند:</p>
         <form action="/search-brand/{{$product->brand->name}}/result" method="GET">
           <button class="btn btn-sm btn-animated mr-2" style="width: 100px; margin-top: 2px; background-color: #34699A; color: #FDF5AA;"> 
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hash" viewBox="0 0 16 16">
@@ -74,7 +74,7 @@
             <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1m0 5.586 7 7L13.586 9l-7-7H2z"/>
           </svg>
               
-              Category:</p>
+              دسته بندی:</p>
         <form action="/search-category/{{ $product->category->name }}/result" method="GET">
           <button class="btn btn-sm btn-animated mr-2" style="width: 100px; margin-top: 2px; background-color: #34699A; color: #FDF5AA;"> 
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hash" viewBox="0 0 16 16">
@@ -87,14 +87,14 @@
       </div>
       <div style="margin-bottom: 10px;">
         <form action="/show-all-comments/product/{{$product->id}}">
-            <button class="btn btn-sm btn-animated mr-2" style="margin-top: 5px; margin-bottom: 5px;">Show all comments</button>
+            <button class="btn btn-sm btn-animated mr-2" style="margin-top: 5px; margin-bottom: 5px;">نظرات</button>
         </form>
       </div>
       <div>
-      @if((bool)Auth::user()->customer)
-        <form action="/add-to-order/product/{{$product->id  }}" method="POST">
+      @if((bool)!Auth::user()->admin)
+        <form action="/add-to-order/product/{{$product->id}}" method="POST">
           @csrf
-          <button class="btn btn-sm btn-animated mr-2" style="margin-top: 5px; margin-bottom: 5px;">Add to purchase box</button>
+          <button class="btn btn-sm btn-animated mr-2" style="margin-top: 5px; margin-bottom: 5px;">اضافه کردن به سبد خرید</button>
         </form>
       </div>
       @endif
@@ -103,7 +103,7 @@
       @if(Auth::user()->customer->orders()->where('product_id', $product->id)->exists())
         <div style="margin-bottom: 10px;">
           <form action="/comment-form/{{$product->id}}"  method="GET">
-            <button class="btn btn-sm btn-animated mr-2" style="margin-top: 5px; margin-bottom: 5px;">Comment</button>
+            <button class="btn btn-sm btn-animated mr-2" style="margin-top: 5px; margin-bottom: 5px;">نظر</button>
           </form>
         </div>
       @endif

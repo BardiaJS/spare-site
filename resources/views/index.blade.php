@@ -8,21 +8,21 @@
           <form action="/register" method="POST" id="registration-form">
             @csrf
             <div class="form-group">
-              <label for="first-name-register" class="text-muted mb-1"><small>First Name</small></label>
-              <input value="{{old('first_name')  }}" name="first_name" id="first-name-register" class="form-control" type="text" placeholder="First Name" autocomplete="off" />
+              <label for="first-name-register" class="text-muted mb-1"><small>نام</small></label>
+              <input value="{{old('first_name')  }}" name="first_name" id="first-name-register" class="form-control" type="text" placeholder="نام" autocomplete="off" />
               @error('first_name')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
             <div class="form-group">
-              <label for="last-name-register" class="text-muted mb-1"><small>Last Name</small></label>
-              <input value="{{old('last_name')  }}" name="last_name" id="last-name-register" class="form-control" type="text" placeholder="Last Name" autocomplete="off" />
+              <label for="last-name-register" class="text-muted mb-1"><small>نام خانوادگی</small></label>
+              <input value="{{old('last_name')  }}" name="last_name" id="last-name-register" class="form-control" type="text" placeholder="نام خانوادگی" autocomplete="off" />
               @error('last_name')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
             <div class="form-group">
-              <label for="email-register" class="text-muted mb-1"><small>Email</small></label>
+              <label for="email-register" class="text-muted mb-1"><small>ایمیل</small></label>
               <input value="{{old('email')  }}" name="email" id="email-register" class="form-control" type="text" placeholder="you@example.com" autocomplete="off" />
               @error('email')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
@@ -30,13 +30,13 @@
             </div>
 
             <div class="form-group">
-              <label for="password-register" class="text-muted mb-1"><small>Password</small></label>
-              <input name="password" id="password-register" class="form-control" type="password" placeholder="Create a password" />
+              <label for="password-register" class="text-muted mb-1"><small>رمز عبور</small></label>
+              <input name="password" id="password-register" class="form-control" type="password" placeholder="رمز عبور" />
               @error('password')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-            <button type="submit" class="btn btn-sm btn-animated mr-2">Sign up for Sam Project</button>
+            <button type="submit" class="btn btn-sm btn-animated mr-2">ثبت نام</button>
           </form>
         </div>
       </div>

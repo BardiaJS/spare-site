@@ -35,39 +35,39 @@
 
             </div>
             <div class="form-group">
-              <label for="title-register" class="text-muted mb-1"><small>Title</small></label>
-              <input value="{{old('title')  }}" name="title" id="title-register" class="form-control" type="text" placeholder="Title" autocomplete="off" /> 
+              <label for="title-register" class="text-muted mb-1"><small>تایتل</small></label>
+              <input value="{{old('title')  }}" name="title" id="title-register" class="form-control" type="text" placeholder="تایتل" autocomplete="off" /> 
               @error('title')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
             <div class="form-group">
-              <label for="iformation-register" class="text-muted mb-1"><small>Information</small></label>
-              <input value="{{old('information')  }}" name="information" id="information-register" class="form-control" type="text" placeholder="information" autocomplete="off" />
+              <label for="iformation-register" class="text-muted mb-1"><small>اطلاعات</small></label>
+              <input value="{{old('information')  }}" name="information" id="information-register" class="form-control" type="text" placeholder="اطلاعات" autocomplete="off" />
               @error('information')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
 
             <div class="form-group">
-              <label for="value-register" class="text-muted mb-1"><small>Value</small></label>
-              <input value="{{old('value')  }}" name="value" id="value-register" class="form-control" type="number" min="0" placeholder="...Toman" autocomplete="off" />
+              <label for="value-register" class="text-muted mb-1"><small>قیمت</small></label>
+              <input value="{{old('value')  }}" name="value" id="value-register" class="form-control" type="number" min="0" placeholder="قیمت..." autocomplete="off" />
               @error('value')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
 
             <div class="form-group">
-              <label for="vehicle-register" class="text-muted mb-1"><small>Vehicle</small></label>
-              <input value="{{old('vehicle')  }}" name="vehicle" id="vehicle-register" class="form-control" type="text" placeholder="vehicle" autocomplete="off" />
+              <label for="vehicle-register" class="text-muted mb-1"><small>وسیله نقلیه</small></label>
+              <input value="{{old('vehicle')  }}" name="vehicle" id="vehicle-register" class="form-control" type="text" placeholder="وسیله نقلیه" autocomplete="off" />
               @error('vehicle')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
             @if (count($brands)>0 and count($categories) > 0)
-              <button type="submit" class="btn btn-sm btn-animated mr-2">Set Product</button>
+              <button type="submit" class="btn btn-sm btn-animated mr-2"> اضافه کردن محصولات</button>
             @else
-              <button disabled type="submit" class="btn btn-sm btn-animated mr-2">Set Product</button>
+              <button disabled type="submit" class="btn btn-sm btn-animated mr-2">اضافه کردن محصولات </button>
             @endif
 
           </form>

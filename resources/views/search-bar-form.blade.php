@@ -5,7 +5,7 @@
                 id="searchInput"
                 name="term" 
                 class="form-control" 
-                placeholder="Search products..."
+                placeholder="جست و جو..."
                 value="{{ request('term') }}"
                 style="margin-right: 10px">
             <button type="submit" class="btn btn-sm btn-animated mr-2">

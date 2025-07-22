@@ -7,13 +7,13 @@
           <form action="/add-brand" method="POST" id="registration-form">
             @csrf
             <div class="form-group">
-              <label for="category-code-register" class="text-muted mb-1"><small>Brand Name</small></label>
-              <input name="name" id="category-code-register" class="form-control" type="text" placeholder="Brand" autocomplete="off" />
+              <label for="category-code-register" class="text-muted mb-1"><small> نام برند</small></label>
+              <input name="name" id="category-code-register" class="form-control" type="text" placeholder="نام برند" autocomplete="off" />
               @error('name')
                 <p class="m-0 small alert alert-danger shadow-sm">{{$message}}</p>
               @enderror
             </div>
-            <button type="submit" class="btn btn-sm btn-animated mr-2">Add Brand</button>
+            <button type="submit" class="btn btn-sm btn-animated mr-2">اضافه کردن برند</button>
           </form>
         </div>
         <div class="col-lg-3 py-3 py-md-5">
