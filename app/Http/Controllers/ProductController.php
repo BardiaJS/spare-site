@@ -105,4 +105,9 @@ $totalValue = Order::where('customer_id', $customerId)
 
         return view('shopping-cart', ['productions' => $products , 'fee' => $totalValue]);
     }
+
+    public function delete_product_from_list_product(Product $product){
+        $product->delete();
+        return redirect('/all-productions')->with('success' , 'محصول با موفقیت از صفحه فروش حذف شد.');
+    }
 }

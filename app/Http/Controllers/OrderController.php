@@ -14,11 +14,11 @@ class OrderController extends Controller
         $validated ['customer_id'] = Auth::user()->customer->id;
         $validated ['product_id'] = $product->id;
         Order::create($validated);
-        return redirect('/shopping-cart')->with('success','Added to purchases order successfully!');
+        return redirect('/shopping-cart')->with('success','محصول با موفقیت به سبد خرید اضافه شد.');
     }
 
     public function delete_from_order(Request $request , Order $order){
         $order->delete();
-        return redirect('/shopping-cart')->with('success','The product had been deleted from your cart successfully!');
+        return redirect('/shopping-cart')->with('success','محصول با موفقیت از سبد خرید حذف شد.');
     }
 }

@@ -4,7 +4,7 @@
       <p class="m-0 small shadow-sm" style="color: red">محصولی وجود ندارد</p>
     </div> 
     @else
-      <div class="list-group text-center bg-transparent" style="">
+      <div class="list-group text-center g-transparent" style="">
         @foreach ($productions as $product)
             <a  href="/single-product/product/{{$product->id}}" class="list-group-item list-group-item-action bg-transparent">
                <img class="avatar-tiny" src="{{  $product->image_url}}" /> 
@@ -39,7 +39,6 @@
                @if((bool)!Auth::user()->admin)
                   <form action="/add-to-order/product/{{$product->id}}" method="POST">
                     @csrf
-                  
                     <button class="btn btn-sm btn-animated mr-2">اضافه کردن به سبد خرید</button>
                   </form>
                @endif

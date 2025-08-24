@@ -69,3 +69,4 @@ Route::get('/search-user-input/result' , [UserController::class, 'search_by_user
 Route::get('/search-brand/{brandName}/result' , [UserController::class, 'search_by_brand'])->middleware('auth');
 Route::get('/search-category/{brandName}/result' , [UserController::class, 'search_by_category'])->middleware('auth');
 Route::get('/shopping-cart' , [ProductController::class, 'show_shopping_cart'])->middleware('auth');
+Route::delete('/delete-from-product-list/product/{product}' , [ProductController::class , 'delete_product_from_list_product'])->middleware('auth');

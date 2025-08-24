@@ -17,6 +17,6 @@ class BrandController extends Controller
         ]);
 
         Brand::create($validated);
-        return redirect('/')->with('success','New Brand Successfully added!');
+        return redirect('/')->with('success','برند جدید با موفقیت اضافه شد.');
     }
 }

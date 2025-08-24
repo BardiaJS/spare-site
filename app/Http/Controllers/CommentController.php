@@ -22,13 +22,13 @@ class CommentController extends Controller
         $validated['customer_id'] = Auth::user()->customer->id;
         $product_id = $product->id;
         Comment::create($validated);
-        return redirect("/single-product/product/$product_id")->with('success','Comment added Successfully!');
+        return redirect("/single-product/product/$product_id")->with('success','نظر شما با موفقیت ثبت شد.');
     }
 
     public function delete_comment(Comment $comment){
         $product_id = $comment->product_id;
         $comment->delete();
-        return redirect("/show-all-comments/product/{$product_id}")->with("success","Comment deleted successfully!");
+        return redirect("/show-all-comments/product/{$product_id}")->with("success","کامنت شما با موفقیت حذف شد.");
     }
 
     public function edit_comment_form(Comment $comment){
@@ -41,6 +41,6 @@ class CommentController extends Controller
         ]);
         $product_id = $comment->product_id;
         $comment->update($validated);
-        return redirect("/show-all-comments/product/$product_id")->with('success','Update the comment successfully!');
+        return redirect("/show-all-comments/product/$product_id")->with('success','نظر شما با موفقیت بروزرسانی شد.');
     }
 }

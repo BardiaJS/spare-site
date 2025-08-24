@@ -26,7 +26,7 @@ class AdminController extends Controller
         $validated['user_id'] = $user->id;
         if($validated['age'] >= 18){
             Admin::create($validated);
-            return redirect('/')->with('success','You successfully completed admin details!');
+            return redirect('/')->with('success','شما با موفقیت اطلاعات تکمیلی ادمین را پر کردید.');
         }
     }
 
@@ -40,7 +40,7 @@ class AdminController extends Controller
         ]);
 
         $admin->update($validated);
-        return redirect('/')->with('success','Admin information updated successfully!');
+        return redirect('/')->with('success','اطلاعات ادمین با موفقیت بروزرسانی شد.');
     }
 
     public function ban_user(User $user){
@@ -48,12 +48,12 @@ class AdminController extends Controller
         $validated['admin_id'] = Auth::user()->admin->id;
         $validated['email'] = $user->email;
         Ban::create($validated);
-        return back()->with('success','User banned successfully!');
+        return back()->with('success','کاربر با موفقیت بن شد.');
     }
 
     public function unban_user(User $user){
         DB::table('bans')->where('user_id', $user->id)->delete();
-        return back()->with('success', 'User unbanned successfully');
+        return back()->with('success', 'کاربر با موفقیت آنبن شد.');
     }
 
     public function ban_list(){

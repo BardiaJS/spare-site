@@ -49,7 +49,7 @@ class UserController extends Controller
         $login_create_data ['user_id'] =Auth::user()->id;
         $login_create_data ['last_time_login'] =(string) Carbon::now();
         Login::create($login_create_data);
-        return redirect('/')->with('success','You have successfully registered!');
+        return redirect('/')->with('success','با موفقیت ثبت نام شدید.');
     }
 
     public function login(UserLoginRequest $userLoginRequest){
@@ -58,9 +58,9 @@ class UserController extends Controller
             $userLoginRequest->session()->regenerate();
             $data['last_time_login'] = Carbon::now();
             Auth::user()->login->update($data);
-            return redirect('/')->with('success','You have successfully logged in!');
+            return redirect('/')->with('success','ورود موفقیت آمیز بود.');
         }else{
-            return redirect('/')->with('error','There was invalid data!');
+            return redirect('/')->with('error','ورودی اشتباه است.');
         }
     }
 
@@ -77,11 +77,11 @@ class UserController extends Controller
                 'user_id' => $user->id
             ]); 
         }
-        return redirect('/')->with('success','Your profile successfully completed!');
+        return redirect('/')->with('success','پروفایل با موفقیت کامل شد');
     }
     public function logout(){
         Auth::logout(); 
-        return redirect('/')->with('success','You have successfully logged out!');
+        return redirect('/')->with('success','خروج موفقیت آمیز بود.');
     }
 
 
@@ -114,7 +114,7 @@ class UserController extends Controller
 
         $user->profile->update($validated_profile_information);
 
-        return redirect('/')->with('success','Updated successfully!');
+        return redirect('/')->with('success','تغییرات با موفقیت اعمال شذ.');
     }
 
     public function user_password_form(User $user){
@@ -130,9 +130,9 @@ class UserController extends Controller
         if(Hash::check($validated['current_password'], $user->password)){
             $user->password = bcrypt($validated['new_password']);
             $user->save();
-            return redirect('/')->with('success','Password updated successfully!');
+            return redirect('/')->with('success','رمز عبور با موفقیت بروز رسانی شد.');
         }else{
-            return redirect('/')->with('error','The current password is not correct!');
+            return redirect('/')->with('error','رمز عبور فعلی را اشتباه وارد کرده اید.');
         }
     }
 
@@ -149,7 +149,7 @@ class UserController extends Controller
     try {
         // بررسی وجود فایل
         if (!$request->hasFile('avatar')) {
-            return back()->with('error', "Didn't choose the picture!");
+            return back()->with('error', "عکسی انتخاب نکرده اید.");
         }
 
         // حذف آواتار قدیمی
@@ -166,7 +166,7 @@ class UserController extends Controller
         
         // ذخیره تصویر با بررسی نتیجه
         if (!Storage::disk('public')->put($filename, $image->toJpeg(80))) {
-            throw new \Exception('Failed to save file');
+            throw new \Exception('نمیتوان عکس را ذخیره کرد.');
         }
 
         // استفاده از رابطه مدل
@@ -175,7 +175,7 @@ class UserController extends Controller
             ['path' => $filename]
         );
 
-        return back()->with('success', "Avatar uploades successfully!");
+        return back()->with('success', "آواتار با موفقیت آپلود شد.");
 
     } catch (\Exception $e) {
         return back()->with('error', "Error in uploading: " . $e->getMessage());
@@ -187,7 +187,7 @@ public function search_by_user_input(Request $request) {
     $term = $request->input('term'); // Changed from 'search' to 'term'
     
     if(empty($term)) {
-        return redirect()->back()->with('error', 'Please enter a search term');
+        return redirect()->back()->with('error', 'لطفا چیزی را سرچ کنید.');
     }
 
     $products = Product::where('title', 'like', "%$term%")

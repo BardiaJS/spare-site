@@ -20,6 +20,6 @@ class CategoryController extends Controller
         ]);
         // return $validated;
         Category::create($validated);
-        return redirect('/')->with('success','New category added successfully!');
+        return redirect('/')->with('success','کتگوری جدید با موفقیت افزوده شد.');
     }
 }
