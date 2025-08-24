@@ -35,7 +35,11 @@
             </svg>
             اضافه کردن محصول</a>
         @endif
+        @if(Auth::user()->customer)
           <p class="lead text-muted">میتوانید لیست محصولات را ببینید از طریق <a href="/all-productions">این لینک</a></p>
+        @else
+          <p class="lead text-muted">برای دیدن محصوات ابتدا باید پروفایل خود را کامل کنید از طریق <a href="/complete-profile-user/{{Auth::user()->id}}">این لینک</a></p>
+        @endif
       </div>
     </div>
 </x-layout>
