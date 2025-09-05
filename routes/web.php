@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
@@ -70,3 +71,4 @@ Route::get('/search-brand/{brandName}/result' , [UserController::class, 'search_
 Route::get('/search-category/{brandName}/result' , [UserController::class, 'search_by_category'])->middleware('auth');
 Route::get('/shopping-cart' , [ProductController::class, 'show_shopping_cart'])->middleware('auth');
 Route::delete('/delete-from-product-list/product/{product}' , [ProductController::class , 'delete_product_from_list_product'])->middleware('auth');
+Route::post('/buy-cart' , [CustomerController::class , 'buy'])->middleware('auth');
