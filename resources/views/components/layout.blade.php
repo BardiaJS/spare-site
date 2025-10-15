@@ -320,7 +320,6 @@
   <body>
     <header class="header-bar mb-3">
       <div class="container d-flex flex-column flex-md-row align-items-center p-3">
-        
         <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">سایت یدکی سم</a></h4>
         @auth
           <div class="flex-row my-3 my-md-0">

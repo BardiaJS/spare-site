@@ -162,18 +162,12 @@
                                                     <div class="progress" style="height: 4px;">
                                                         <div class="progress-bar" id="passwordStrength" role="progressbar" style="width: 0%"></div>
                                                     </div>
-                                                    <small class="text-muted" id="passwordHint">حداقل ۸ کاراکتر شامل حروف و اعداد</small>
+                                                    <small class="text-muted" id="passwordHint">حداقل 6 کاراکتر شامل حروف و اعداد</small>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- قوانین و مقررات -->
-                                        <div class="form-check mb-4">
-                                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                                            <label class="form-check-label text-muted" for="agreeTerms">
-                                                با <a href="/terms" class="text-primary">قوانین و مقررات</a> موافقم
-                                            </label>
-                                        </div>
+
 
                                         <!-- دکمه ثبت نام -->
                                         <div class="d-grid mb-3">
@@ -183,13 +177,6 @@
                                             </button>
                                         </div>
 
-                                        <!-- ورود به حساب -->
-                                        <div class="text-center">
-                                            <p class="text-muted mb-0">
-                                                قبلاً حساب دارید؟
-                                                <a href="/login" class="text-primary fw-bold">وارد شوید</a>
-                                            </p>
-                                        </div>
                                     </form>
                                 </div>
                             </div>

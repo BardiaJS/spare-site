@@ -35,32 +35,6 @@
                             </button>
                         </div>
 
-                        <!-- فیلترهای پیشرفته (اختیاری) -->
-                        <div class="search-filters">
-                            <div class="filter-options">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="filterProducts" name="filter" value="products" checked>
-                                    <label class="form-check-label" for="filterProducts">
-                                        <i class="fas fa-cube me-1"></i>
-                                        محصولات
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="filterCategories" name="filter" value="categories">
-                                    <label class="form-check-label" for="filterCategories">
-                                        <i class="fas fa-folder me-1"></i>
-                                        دسته‌بندی‌ها
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="filterBrands" name="filter" value="brands">
-                                    <label class="form-check-label" for="filterBrands">
-                                        <i class="fas fa-copyright me-1"></i>
-                                        برندها
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
                     </form>
                 </div>
 
