@@ -21,7 +21,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('main.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400..700&display=swap" rel="stylesheet">
     <style>
+
         :root {
             --primary: #2c5aa0;
             --primary-dark: #1e3d72;
@@ -40,7 +44,7 @@
         }
         
         body {
-            font-family: "Noto Sans Arabic", "Nunito", sans-serif;
+            font-family: "El Messiri", "Nunito", sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
             min-height: 100vh;
             display: flex;
@@ -294,7 +298,7 @@
         
         /* افکت‌های ویژه برای المان‌های تعاملی */
         .tooltip {
-            font-family: "Noto Sans Arabic", "Nunito", sans-serif;
+            font-family: "El Messiri", "Nunito", sans-serif;
         }
         
         /* بهبود فرم‌ها */
@@ -373,7 +377,7 @@
         @else
           <form action="/login" method="POST" class="mb-0 pt-2 pt-md-0">
             @csrf
-              <div class="row align-items-center">
+              <div class="row align-items-center" style="margin-right: 20px;">
                 <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
                   <input name="email" class="form-control form-control-sm input-dark" type="text" placeholder="ایمیل" autocomplete="off" />
                                     
