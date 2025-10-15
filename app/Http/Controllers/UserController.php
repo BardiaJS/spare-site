@@ -43,8 +43,13 @@ class UserController extends Controller
     }
     public function register(UserRegisterRequest $userRegisterRequest){
         $validated = $userRegisterRequest->validated();
-        $validated ['password'] = bcrypt($validated['password']);
-        $user =User::create($validated);
+        $validated ['register_password'] = bcrypt($validated['password']);
+        $user =User::create([
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'], 
+            'email' => $validated['register_email'],
+            'password' => $validated['register_password']
+        ]);
         Auth::login($user);
         $login_create_data ['user_id'] =Auth::user()->id;
         $login_create_data ['last_time_login'] =(string) Carbon::now();

@@ -131,9 +131,9 @@
                                                     <span class="input-group-text">
                                                         <i class="fas fa-envelope text-primary"></i>
                                                     </span>
-                                                    <input value="{{old('email')}}" name="email" id="email-register" class="form-control" type="text" placeholder="you@example.com" autocomplete="off" />
+                                                    <input value="{{old('register_email')}}" name="register_email" id="email-register" class="form-control" type="text" placeholder="you@example.com" autocomplete="off" />
                                                 </div>
-                                                @error('email')
+                                                @error('register_email')
                                                 <div class="alert alert-danger mt-2 py-2 d-flex align-items-center" role="alert">
                                                     <i class="fas fa-exclamation-circle me-2"></i>
                                                     <span>{{ $message }}</span>
@@ -147,12 +147,12 @@
                                                     <span class="input-group-text">
                                                         <i class="fas fa-key text-primary"></i>
                                                     </span>
-                                                    <input name="password" id="password-register" class="form-control" type="password" placeholder="رمز عبور قوی انتخاب کنید" />
+                                                    <input name="register_password" id="password-register" class="form-control" type="password" placeholder="رمز عبور قوی انتخاب کنید" />
                                                     <button type="button" class="btn btn-outline-secondary" id="togglePassword">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                 </div>
-                                                @error('password')
+                                                @error('register_password')
                                                 <div class="alert alert-danger mt-2 py-2 d-flex align-items-center" role="alert">
                                                     <i class="fas fa-exclamation-circle me-2"></i>
                                                     <span>{{ $message }}</span>

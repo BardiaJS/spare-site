@@ -379,11 +379,10 @@
             @csrf
               <div class="row align-items-center" style="margin-right: 20px;">
                 <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
-                  <input name="email" class="form-control form-control-sm input-dark" type="text" placeholder="ایمیل" autocomplete="off" />
-                                    
+                  <input name="email" class="form-control form-control-sm input-dark" type="text" placeholder="ایمیل" autocomplete="off" required/>
                 </div>
                 <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">
-                  <input name="password" class="form-control form-control-sm input-dark" type="password" placeholder="رمز عبور" />
+                  <input name="password" class="form-control form-control-sm input-dark" type="password" placeholder="رمز عبور" required/>
                 </div>
                 <div class="col-md-auto">
                   <button class="btn btn-sm btn-animated mr-2" >ورود</button>

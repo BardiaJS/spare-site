@@ -25,8 +25,8 @@ class UserRegisterRequest extends FormRequest
         return [
             "first_name"=> "required",
             "last_name"=> "required",
-            "email"=> ["required" , Rule::unique('users','email')],
-            'password'=> ['required','min:6'],
+            "register_email"=> ["required" , Rule::unique('users','email')],
+            'register_password'=> ['required','min:6'],
             
             
         ]; 
