@@ -98,7 +98,7 @@
         </form>
       </div>
       @endif
-      @if ((bool) Auth::user()->admin)
+      @if ((bool) Auth::user()->customer)
         <form action="/delete-from-product-list/product/{{$product->id}}" method="POST">
           @csrf
           @method('DELETE')

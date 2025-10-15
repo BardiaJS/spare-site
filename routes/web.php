@@ -29,9 +29,15 @@ Route::post('/add-product' , [ProductController::class , 'put_product_for_sale']
 
 Route::get('/add-category' , [CategoryController::class , 'show_category_form'])->middleware('auth');
 Route::post('/add-category' , [CategoryController::class ,'add_category'])->middleware('auth');
+Route::get('/edit-category/category/{category}' , [CategoryController::class, 'show_edit_category_form'])->middleware('auth');
+Route::put('/edit-category/category/{category}' , [CategoryController::class, 'edit_category'])->middleware('auth');
+Route::delete('/delete-category/category/{category}' , [CategoryController::class , 'delete_category']) ->middleware('auth');
 
 Route::get('/add-brand' , [BrandController::class , 'add_brand_form'])->middleware('auth');
 Route::post('/add-brand' , [BrandController::class ,'add_brand'])->middleware('auth');
+Route::get('/edit-brand/brand/{brand}' , [BrandController::class, 'show_edit_brand_form'])->middleware('auth');
+Route::put('/edit-brand/brand/{brand}' , [BrandController::class, 'edit_brand'])->middleware('auth');
+Route::delete('/delete-brand/brand/{brand}' , [BrandController::class, 'delete_brand'])->middleware('auth');
 
 Route::get('/single-profile/user/{user}' , [UserController::class, 'user_single_profile'])->middleware('auth');
 Route::get('/user-information/user/{user}' , [UserController::class , 'user_information_form'])->middleware('auth');
