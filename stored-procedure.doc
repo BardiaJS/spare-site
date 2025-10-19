@@ -1,0 +1,1843 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_comment`(
+    IN p_customer_id INT,
+    IN p_product_id INT,
+    IN p_body TEXT
+)
+BEGIN
+    DECLARE v_has_purchased INT;
+    
+    SELECT COUNT(*) INTO v_has_purchased 
+    FROM purchasehistories 
+    WHERE customer_id = p_customer_id AND product_id = p_product_id;
+    
+    IF v_has_purchased = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'فقط مشتریانی که محصول را خریداری کرده‌اند می‌توانند نظر ثبت کنند';
+    END IF;
+    
+    INSERT INTO comments (customer_id, product_id, body, created_at, updated_at)
+    VALUES (p_customer_id, p_product_id, p_body, NOW(), NOW());
+    
+    SELECT 
+        LAST_INSERT_ID() as comment_id,
+        'نظر با موفقیت ثبت شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_product_to_order`(
+    IN p_customer_id INT,
+    IN p_product_id INT
+)
+BEGIN
+    DECLARE v_customer_exists INT;
+    DECLARE v_product_exists INT;
+    DECLARE v_already_in_cart INT;
+    DECLARE v_product_title VARCHAR(255);
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- بررسی وجود مشتری
+    SELECT COUNT(*) INTO v_customer_exists FROM customers WHERE id = p_customer_id;
+    IF v_customer_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'مشتری یافت نشد';
+    END IF;
+    
+    -- بررسی وجود محصول و گرفتن عنوان
+    SELECT COUNT(*), title INTO v_product_exists, v_product_title 
+    FROM products WHERE id = p_product_id;
+    
+    IF v_product_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+    
+    -- بررسی وجود محصول در سبد خرید
+    SELECT COUNT(*) INTO v_already_in_cart 
+    FROM orders 
+    WHERE customer_id = p_customer_id AND product_id = p_product_id;
+    
+    IF v_already_in_cart > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'این محصول قبلاً در سبد خرید شما وجود دارد';
+    END IF;
+    
+    -- اضافه کردن محصول به سبد خرید
+    INSERT INTO orders (customer_id, product_id, created_at, updated_at)
+    VALUES (p_customer_id, p_product_id, NOW(), NOW());
+    
+    COMMIT;
+    
+    SELECT 
+        LAST_INSERT_ID() as order_id,
+        v_product_title as product_title,
+        'محصول با موفقیت به سبد خرید اضافه شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_to_cart`(
+    IN p_customer_id INT,
+    IN p_product_id INT
+)
+BEGIN
+    DECLARE v_customer_exists INT;
+    DECLARE v_product_exists INT;
+    DECLARE v_product_value DECIMAL(12,2);
+    DECLARE v_already_in_cart INT;
+    
+    -- بررسی وجود مشتری
+    SELECT COUNT(*) INTO v_customer_exists FROM customers WHERE id = p_customer_id;
+    IF v_customer_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'مشتری یافت نشد';
+    END IF;
+    
+    -- بررسی وجود محصول
+    SELECT COUNT(*), value INTO v_product_exists, v_product_value 
+    FROM products WHERE id = p_product_id;
+    
+    IF v_product_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+    
+    -- بررسی وجود محصول در سبد خرید
+    SELECT COUNT(*) INTO v_already_in_cart 
+    FROM orders 
+    WHERE customer_id = p_customer_id AND product_id = p_product_id;
+    
+    IF v_already_in_cart > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول قبلاً به سبد خرید اضافه شده است';
+    END IF;
+    
+    -- اضافه کردن به سبد خرید
+    INSERT INTO orders (customer_id, product_id, created_at, updated_at)
+    VALUES (p_customer_id, p_product_id, NOW(), NOW());
+    
+    SELECT 
+        LAST_INSERT_ID() as order_id,
+        'محصول به سبد خرید اضافه شد' as message,
+        v_product_value as product_price;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ban_user`(
+    IN p_user_id INT,
+    IN p_admin_id INT,
+    IN p_user_email VARCHAR(255)
+)
+BEGIN
+    DECLARE v_user_exists INT;
+    DECLARE v_admin_exists INT;
+    DECLARE v_already_banned INT;
+    
+    -- بررسی وجود کاربر
+    SELECT COUNT(*) INTO v_user_exists FROM users WHERE id = p_user_id;
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر یافت نشد';
+    END IF;
+    
+    -- بررسی وجود ادمین
+    SELECT COUNT(*) INTO v_admin_exists FROM admins WHERE id = p_admin_id;
+    IF v_admin_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ادمین یافت نشد';
+    END IF;
+    
+    -- بررسی بن بودن قبلی کاربر
+    SELECT COUNT(*) INTO v_already_banned FROM bans WHERE user_id = p_user_id;
+    IF v_already_banned > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر قبلاً بن شده است';
+    END IF;
+    
+    -- بن کردن کاربر
+    INSERT INTO bans (user_id, admin_id, email, created_at, updated_at)
+    VALUES (p_user_id, p_admin_id, p_user_email, NOW(), NOW());
+    
+    SELECT 'کاربر با موفقیت بن شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `become_admin`(
+    IN p_user_id INT,
+    IN p_national_code VARCHAR(10),
+    IN p_information TEXT,
+    IN p_age INT
+)
+BEGIN
+    DECLARE v_user_exists INT;
+    DECLARE v_national_code_exists INT;
+    
+    -- بررسی وجود کاربر
+    SELECT COUNT(*) INTO v_user_exists FROM users WHERE id = p_user_id;
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر یافت نشد';
+    END IF;
+    
+    -- بررسی کد ملی تکراری
+    SELECT COUNT(*) INTO v_national_code_exists FROM admins WHERE national_code = p_national_code;
+    IF v_national_code_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کد ملی قبلاً ثبت شده است';
+    END IF;
+    
+    -- بررسی سن
+    IF p_age < 18 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'سن باید 18 سال یا بیشتر باشد';
+    END IF;
+    
+    -- ایجاد ادمین
+    INSERT INTO admins (user_id, national_code, information, age, created_at, updated_at)
+    VALUES (p_user_id, p_national_code, p_information, p_age, NOW(), NOW());
+    
+    -- آپدیت نقش کاربر به ادمین
+    UPDATE users SET role = 'admin', updated_at = NOW() WHERE id = p_user_id;
+    
+    SELECT 
+        LAST_INSERT_ID() as admin_id,
+        'ادمین با موفقیت ایجاد شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `calculate_cart_total`(
+    IN p_customer_id INT
+)
+BEGIN
+    SELECT 
+        COUNT(o.id) as items_count,
+        SUM(p.value) as total_amount,
+        MIN(p.value) as cheapest_item,
+        MAX(p.value) as most_expensive_item
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    WHERE o.customer_id = p_customer_id;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `change_user_password`(
+    IN p_user_id INT,
+    IN p_current_password VARCHAR(255),
+    IN p_new_password VARCHAR(255)
+)
+BEGIN
+    DECLARE v_current_password_hash VARCHAR(255);
+    DECLARE v_user_exists INT;
+    
+    -- گرفتن رمز عبور فعلی
+    SELECT password, COUNT(*) INTO v_current_password_hash, v_user_exists
+    FROM users WHERE id = p_user_id;
+    
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر یافت نشد';
+    END IF;
+    
+    -- بررسی تطابق رمز عبور فعلی
+    IF v_current_password_hash != p_current_password THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'رمز عبور فعلی را اشتباه وارد کرده اید';
+    END IF;
+    
+    -- آپدیت رمز عبور
+    UPDATE users 
+    SET password = p_new_password, 
+        updated_at = NOW() 
+    WHERE id = p_user_id;
+    
+    SELECT 'رمز عبور با موفقیت بروز رسانی شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `check_category_deletable`(
+    IN p_category_id INT
+)
+BEGIN
+    DECLARE v_products_count INT;
+    DECLARE v_category_name VARCHAR(255);
+    
+    -- گرفتن نام دسته‌بندی و تعداد محصولات
+    SELECT 
+        c.name,
+        COUNT(p.id) as products_count
+    INTO v_category_name, v_products_count
+    FROM categories c
+    LEFT JOIN products p ON c.id = p.category_id
+    WHERE c.id = p_category_id
+    GROUP BY c.id, c.name;
+    
+    IF v_category_name IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'دسته‌بندی یافت نشد';
+    END IF;
+    
+    SELECT 
+        v_category_name as category_name,
+        v_products_count as products_count,
+        CASE 
+            WHEN v_products_count = 0 THEN 'قابل حذف'
+            ELSE 'غیرقابل حذف - دارای محصول مرتبط'
+        END as deletable_status;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `check_comment_permission`(
+    IN p_customer_id INT,
+    IN p_product_id INT
+)
+BEGIN
+    DECLARE v_has_purchased INT;
+    DECLARE v_already_commented INT;
+    
+    -- بررسی خرید محصول
+    SELECT COUNT(*) INTO v_has_purchased 
+    FROM purchasehistories 
+    WHERE customer_id = p_customer_id AND product_id = p_product_id;
+    
+    -- بررسی نظر قبلی
+    SELECT COUNT(*) INTO v_already_commented 
+    FROM comments 
+    WHERE customer_id = p_customer_id AND product_id = p_product_id;
+    
+    SELECT 
+        v_has_purchased as has_purchased,
+        v_already_commented as already_commented,
+        CASE 
+            WHEN v_has_purchased = 0 THEN 'شما این محصول را خریداری نکرده‌اید'
+            WHEN v_already_commented > 0 THEN 'شما قبلاً برای این محصول نظر داده‌اید'
+            ELSE 'مجاز به ثبت نظر'
+        END as permission_status;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `check_product_in_cart`(
+    IN p_customer_id INT,
+    IN p_product_id INT
+)
+BEGIN
+    DECLARE v_in_cart INT;
+    DECLARE v_order_id INT;
+    
+    SELECT 
+        COUNT(*),
+        id
+    INTO v_in_cart, v_order_id
+    FROM orders 
+    WHERE customer_id = p_customer_id AND product_id = p_product_id;
+    
+    SELECT 
+        v_in_cart as in_cart,
+        v_order_id as order_id,
+        CASE 
+            WHEN v_in_cart > 0 THEN 'محصول در سبد خرید موجود است'
+            ELSE 'محصول در سبد خرید موجود نیست'
+        END as status_message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `check_user_admin`(
+    IN p_user_id INT
+)
+BEGIN
+    SELECT 
+        a.id as admin_id,
+        a.national_code,
+        a.information,
+        a.age,
+        u.first_name,
+        u.last_name,
+        u.email
+    FROM admins a
+    INNER JOIN users u ON a.user_id = u.id
+    WHERE a.user_id = p_user_id;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `check_user_ban_status`(
+    IN p_user_id INT
+)
+BEGIN
+    DECLARE v_is_banned INT;
+    DECLARE v_ban_reason TEXT;
+    
+    SELECT 
+        COUNT(*),
+        COALESCE(GROUP_CONCAT(CONCAT('بن شده توسط ادمین: ', a.id)), '')
+    INTO v_is_banned, v_ban_reason
+    FROM bans b
+    INNER JOIN admins a ON b.admin_id = a.id
+    WHERE b.user_id = p_user_id;
+    
+    SELECT 
+        v_is_banned as is_banned,
+        CASE 
+            WHEN v_is_banned > 0 THEN 'کاربر بن شده است'
+            ELSE 'کاربر فعال است'
+        END as status_message,
+        v_ban_reason as ban_details;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `clear_cart`(
+    IN p_customer_id INT
+)
+BEGIN
+    DECLARE v_items_count INT;
+    
+    SELECT COUNT(*) INTO v_items_count 
+    FROM orders 
+    WHERE customer_id = p_customer_id;
+    
+    IF v_items_count = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'سبد خرید شما از قبل خالی است';
+    END IF;
+    
+    DELETE FROM orders WHERE customer_id = p_customer_id;
+    
+    SELECT 
+        'سبد خرید با موفقیت خالی شد' as message,
+        v_items_count as removed_items_count;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `complete_user_profile`(
+    IN p_user_id INT,
+    IN p_phone VARCHAR(15),
+    IN p_address TEXT,
+    IN p_postal_code VARCHAR(10)
+)
+BEGIN
+    DECLARE v_user_exists INT;
+    DECLARE v_profile_exists INT;
+    DECLARE v_customer_exists INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- بررسی وجود کاربر
+    SELECT COUNT(*) INTO v_user_exists FROM users WHERE id = p_user_id;
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر یافت نشد';
+    END IF;
+    
+    -- ایجاد یا آپدیت پروفایل
+    IF EXISTS (SELECT 1 FROM profiles WHERE user_id = p_user_id) THEN
+        UPDATE profiles 
+        SET phone = p_phone, 
+            address = p_address, 
+            postal_code = p_postal_code,
+            updated_at = NOW()
+        WHERE user_id = p_user_id;
+    ELSE
+        INSERT INTO profiles (user_id, phone, address, postal_code, created_at, updated_at)
+        VALUES (p_user_id, p_phone, p_address, p_postal_code, NOW(), NOW());
+    END IF;
+    
+    -- ایجاد مشتری اگر ادمین نباشد
+    SELECT COUNT(*) INTO v_customer_exists FROM customers WHERE user_id = p_user_id;
+    IF v_customer_exists = 0 AND NOT EXISTS (SELECT 1 FROM admins WHERE user_id = p_user_id) THEN
+        INSERT INTO customers (user_id, created_at, updated_at)
+        VALUES (p_user_id, NOW(), NOW());
+    END IF;
+    
+    COMMIT;
+    
+    SELECT 'پروفایل با موفقیت کامل شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_brand`(
+    IN p_name VARCHAR(255)
+)
+BEGIN
+    DECLARE v_brand_exists INT;
+    
+    -- بررسی وجود برند تکراری
+    SELECT COUNT(*) INTO v_brand_exists FROM brands WHERE name = p_name;
+    IF v_brand_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'نام برند قبلاً ثبت شده است';
+    END IF;
+    
+    -- ایجاد برند جدید
+    INSERT INTO brands (name, created_at, updated_at)
+    VALUES (p_name, NOW(), NOW());
+    
+    SELECT 
+        LAST_INSERT_ID() as brand_id,
+        'برند جدید با موفقیت اضافه شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_category`(
+    IN p_name VARCHAR(255)
+)
+BEGIN
+    DECLARE v_category_exists INT;
+    
+    -- بررسی وجود دسته‌بندی تکراری
+    SELECT COUNT(*) INTO v_category_exists FROM categories WHERE name = p_name;
+    IF v_category_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'نام دسته‌بندی قبلاً ثبت شده است';
+    END IF;
+    
+    -- ایجاد دسته‌بندی جدید
+    INSERT INTO categories (name, created_at, updated_at)
+    VALUES (p_name, NOW(), NOW());
+    
+    SELECT 
+        LAST_INSERT_ID() as category_id,
+        'دسته‌بندی جدید با موفقیت افزوده شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_comment`(
+    IN p_product_id INT,
+    IN p_customer_id INT,
+    IN p_body TEXT
+)
+BEGIN
+    DECLARE v_product_exists INT;
+    DECLARE v_customer_exists INT;
+    DECLARE v_has_purchased INT;
+    
+    -- بررسی وجود محصول
+    SELECT COUNT(*) INTO v_product_exists FROM products WHERE id = p_product_id;
+    IF v_product_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+    
+    -- بررسی وجود مشتری
+    SELECT COUNT(*) INTO v_customer_exists FROM customers WHERE id = p_customer_id;
+    IF v_customer_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'مشتری یافت نشد';
+    END IF;
+    
+    -- بررسی خرید محصول توسط مشتری
+    SELECT COUNT(*) INTO v_has_purchased 
+    FROM purchasehistories 
+    WHERE customer_id = p_customer_id AND product_id = p_product_id;
+    
+    IF v_has_purchased = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'فقط مشتریانی که محصول را خریداری کرده‌اند می‌توانند نظر ثبت کنند';
+    END IF;
+    
+    -- بررسی محتوای نامناسب
+    IF (LOWER(p_body) LIKE '%fuck%' OR 
+        LOWER(p_body) LIKE '%boobs%' OR 
+        LOWER(p_body) LIKE '%dick%' OR 
+        LOWER(p_body) LIKE '%shit%' OR 
+        LOWER(p_body) LIKE '%asshole%') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محتوای نظر شامل کلمات نامناسب است';
+    END IF;
+    
+    -- بررسی طول نظر
+    IF LENGTH(p_body) > 50 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'طول نظر نمی‌تواند بیشتر از 50 کاراکتر باشد';
+    END IF;
+    
+    -- ایجاد نظر
+    INSERT INTO comments (product_id, customer_id, body, created_at, updated_at)
+    VALUES (p_product_id, p_customer_id, p_body, NOW(), NOW());
+    
+    SELECT 
+        LAST_INSERT_ID() as comment_id,
+        p_product_id as product_id,
+        'نظر شما با موفقیت ثبت شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_order`(
+    IN p_customer_id INT,
+    IN p_product_id INT
+)
+BEGIN
+    DECLARE v_customer_user_id INT;
+    DECLARE v_product_value DECIMAL(12,2);
+    
+    START TRANSACTION;
+    
+    SELECT user_id INTO v_customer_user_id FROM customers WHERE id = p_customer_id;
+    IF v_customer_user_id IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'مشتری یافت نشد';
+    END IF;
+    
+    SELECT value INTO v_product_value FROM products WHERE id = p_product_id;
+    IF v_product_value IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+    
+    INSERT INTO orders (customer_id, product_id, created_at, updated_at)
+    VALUES (p_customer_id, p_product_id, NOW(), NOW());
+    
+    INSERT INTO purchasehistories (customer_id, product_id, created_at, updated_at)
+    VALUES (p_customer_id, p_product_id, NOW(), NOW());
+    
+    COMMIT;
+    
+    SELECT 
+        LAST_INSERT_ID() as order_id,
+        'سفارش با موفقیت ثبت شد' as message,
+        v_product_value as total_amount;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_product`(
+    IN p_admin_id INT,
+    IN p_brand_id INT,
+    IN p_category_id INT,
+    IN p_title VARCHAR(255),
+    IN p_information TEXT,
+    IN p_value DECIMAL(12,2),
+    IN p_vehicle VARCHAR(100),
+    IN p_image_path VARCHAR(500)
+)
+BEGIN
+    DECLARE v_product_id INT;
+    
+    START TRANSACTION;
+    
+    IF NOT EXISTS (SELECT 1 FROM admins WHERE user_id = p_admin_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ادمین یافت نشد';
+    END IF;
+    
+    INSERT INTO products (admin_id, brand_id, category_id, title, information, value, vehicle, created_at, updated_at)
+    VALUES (p_admin_id, p_brand_id, p_category_id, p_title, p_information, p_value, p_vehicle, NOW(), NOW());
+    
+    SET v_product_id = LAST_INSERT_ID();
+    
+    IF p_image_path IS NOT NULL THEN
+        INSERT INTO images (product_id, path, created_at, updated_at)
+        VALUES (v_product_id, p_image_path, NOW(), NOW());
+    END IF;
+    
+    COMMIT;
+    
+    SELECT 
+        v_product_id as product_id,
+        'محصول با موفقیت ایجاد شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_brand`(
+    IN p_brand_id INT
+)
+BEGIN
+    DECLARE v_brand_exists INT;
+    DECLARE v_has_products INT;
+    
+    -- بررسی وجود برند
+    SELECT COUNT(*) INTO v_brand_exists FROM brands WHERE id = p_brand_id;
+    IF v_brand_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'برند یافت نشد';
+    END IF;
+    
+    -- بررسی وجود محصولات مرتبط
+    SELECT COUNT(*) INTO v_has_products FROM products WHERE brand_id = p_brand_id;
+    IF v_has_products > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'امکان حذف برند به دلیل وجود محصولات مرتبط وجود ندارد';
+    END IF;
+    
+    -- حذف برند
+    DELETE FROM brands WHERE id = p_brand_id;
+    
+    SELECT 'برند با موفقیت حذف شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_category`(
+    IN p_category_id INT
+)
+BEGIN
+    DECLARE v_category_exists INT;
+    DECLARE v_has_products INT;
+    
+    -- بررسی وجود دسته‌بندی
+    SELECT COUNT(*) INTO v_category_exists FROM categories WHERE id = p_category_id;
+    IF v_category_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'دسته‌بندی یافت نشد';
+    END IF;
+    
+    -- بررسی وجود محصولات مرتبط
+    SELECT COUNT(*) INTO v_has_products FROM products WHERE category_id = p_category_id;
+    IF v_has_products > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'امکان حذف دسته‌بندی به دلیل وجود محصولات مرتبط وجود ندارد';
+    END IF;
+    
+    -- حذف دسته‌بندی
+    DELETE FROM categories WHERE id = p_category_id;
+    
+    SELECT 'دسته‌بندی با موفقیت حذف شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_comment`(
+    IN p_comment_id INT
+)
+BEGIN
+    DECLARE v_comment_exists INT;
+    DECLARE v_product_id INT;
+    
+    -- بررسی وجود نظر
+    SELECT COUNT(*), product_id INTO v_comment_exists, v_product_id 
+    FROM comments WHERE id = p_comment_id;
+    
+    IF v_comment_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'نظر یافت نشد';
+    END IF;
+    
+    -- حذف نظر
+    DELETE FROM comments WHERE id = p_comment_id;
+    
+    SELECT 
+        v_product_id as product_id,
+        'کامنت شما با موفقیت حذف شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_from_order`(
+    IN p_order_id INT
+)
+BEGIN
+    DECLARE v_order_exists INT;
+    DECLARE v_customer_id INT;
+    DECLARE v_product_title VARCHAR(255);
+    
+    -- بررسی وجود سفارش و گرفتن اطلاعات
+    SELECT 
+        COUNT(*), 
+        o.customer_id,
+        p.title
+    INTO v_order_exists, v_customer_id, v_product_title
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    WHERE o.id = p_order_id;
+    
+    IF v_order_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'سفارش یافت نشد';
+    END IF;
+    
+    -- حذف محصول از سبد خرید
+    DELETE FROM orders WHERE id = p_order_id;
+    
+    SELECT 
+        v_product_title as product_title,
+        'محصول با موفقیت از سبد خرید حذف شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_product`(
+    IN p_product_id INT
+)
+BEGIN
+    DECLARE v_product_exists INT;
+    DECLARE v_has_orders INT;
+    DECLARE v_has_comments INT;
+    DECLARE v_image_path VARCHAR(500);
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- بررسی وجود محصول
+    SELECT COUNT(*) INTO v_product_exists FROM products WHERE id = p_product_id;
+    IF v_product_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+    
+    -- بررسی وجود سفارشات
+    SELECT COUNT(*) INTO v_has_orders FROM orders WHERE product_id = p_product_id;
+    IF v_has_orders > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'امکان حذف محصول به دلیل وجود سفارشات مرتبط وجود ندارد';
+    END IF;
+    
+    -- گرفتن مسیر تصویر برای حذف فایل
+    SELECT path INTO v_image_path FROM images WHERE product_id = p_product_id;
+    
+    -- حذف نظرات مرتبط
+    DELETE FROM comments WHERE product_id = p_product_id;
+    
+    -- حذف از تاریخچه خرید
+    DELETE FROM purchasehistories WHERE product_id = p_product_id;
+    
+    -- حذف تصویر
+    DELETE FROM images WHERE product_id = p_product_id;
+    
+    -- حذف محصول
+    DELETE FROM products WHERE id = p_product_id;
+    
+    COMMIT;
+    
+    SELECT 
+        'محصول با موفقیت از صفحه فروش حذف شد' as message,
+        COALESCE(v_image_path, '') as deleted_image_path;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_all_brands`()
+BEGIN
+    SELECT 
+        id,
+        name,
+        created_at,
+        updated_at
+    FROM brands 
+    ORDER BY name ASC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_all_categories`()
+BEGIN
+    SELECT 
+        id,
+        name,
+        created_at,
+        updated_at
+    FROM categories 
+    ORDER BY name ASC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_all_products_paginated`(
+    IN p_page INT,
+    IN p_per_page INT
+)
+BEGIN
+    DECLARE v_offset INT;
+    
+    SET v_offset = (p_page - 1) * p_per_page;
+    
+    SELECT 
+        p.id,
+        p.title,
+        p.information,
+        p.value,
+        p.vehicle,
+        b.name as brand_name,
+        c.name as category_name,
+        i.path as image_path,
+        p.created_at
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    LEFT JOIN images i ON p.id = i.product_id
+    ORDER BY p.created_at DESC
+    LIMIT p_per_page OFFSET v_offset;
+    
+    -- تعداد کل محصولات برای صفحه‌بندی
+    SELECT COUNT(*) as total_products FROM products;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_ban_list`(
+    IN p_page INT,
+    IN p_per_page INT
+)
+BEGIN
+    DECLARE v_offset INT;
+    
+    SET v_offset = (p_page - 1) * p_per_page;
+    
+    SELECT 
+        b.id,
+        b.user_id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        b.admin_id,
+        a.national_code as admin_national_code,
+        b.created_at as ban_date
+    FROM bans b
+    INNER JOIN users u ON b.user_id = u.id
+    INNER JOIN admins a ON b.admin_id = a.id
+    ORDER BY b.created_at DESC
+    LIMIT p_per_page OFFSET v_offset;
+    
+    -- تعداد کل برای صفحه‌بندی
+    SELECT COUNT(*) as total_bans FROM bans;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_brand_by_id`(
+    IN p_brand_id INT
+)
+BEGIN
+    SELECT 
+        id,
+        name,
+        created_at,
+        updated_at
+    FROM brands 
+    WHERE id = p_brand_id;
+    
+    IF FOUND_ROWS() = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'برند یافت نشد';
+    END IF;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_brands_and_categories`()
+BEGIN
+    -- گرفتن همه برندها
+    SELECT id, name FROM brands ORDER BY name ASC;
+    
+    -- گرفتن همه دسته‌بندی‌ها
+    SELECT id, name FROM categories ORDER BY name ASC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_brands_stats`()
+BEGIN
+    SELECT 
+        b.id,
+        b.name,
+        COUNT(p.id) as products_count,
+        b.created_at
+    FROM brands b
+    LEFT JOIN products p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.created_at
+    ORDER BY products_count DESC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_cart_items`(
+    IN p_customer_id INT
+)
+BEGIN
+    SELECT 
+        o.id as order_id,
+        o.product_id,
+        p.title,
+        p.value as price,
+        b.name as brand_name,
+        c.name as category_name,
+        o.created_at as added_date
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    WHERE o.customer_id = p_customer_id
+    ORDER BY o.created_at DESC;
+    
+    -- محاسبه مجموع مبلغ
+    SELECT SUM(p.value) as total_amount
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    WHERE o.customer_id = p_customer_id;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_categories_stats`()
+BEGIN
+    SELECT 
+        c.id,
+        c.name,
+        COUNT(p.id) as products_count,
+        c.created_at
+    FROM categories c
+    LEFT JOIN products p ON c.id = p.category_id
+    GROUP BY c.id, c.name, c.created_at
+    ORDER BY products_count DESC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_category_by_id`(
+    IN p_category_id INT
+)
+BEGIN
+    SELECT 
+        id,
+        name,
+        created_at,
+        updated_at
+    FROM categories 
+    WHERE id = p_category_id;
+    
+    IF FOUND_ROWS() = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'دسته‌بندی یافت نشد';
+    END IF;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_comment_by_id`(
+    IN p_comment_id INT
+)
+BEGIN
+    SELECT 
+        c.id,
+        c.body,
+        c.product_id,
+        c.customer_id,
+        p.title as product_title,
+        u.first_name,
+        u.last_name,
+        c.created_at,
+        c.updated_at
+    FROM comments c
+    INNER JOIN products p ON c.product_id = p.id
+    INNER JOIN customers cust ON c.customer_id = cust.id
+    INNER JOIN users u ON cust.user_id = u.id
+    WHERE c.id = p_comment_id;
+    
+    IF FOUND_ROWS() = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'نظر یافت نشد';
+    END IF;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_product_comments`(
+    IN p_product_id INT
+)
+BEGIN
+    SELECT 
+        c.id,
+        c.body,
+        c.customer_id,
+        u.first_name,
+        u.last_name,
+        c.created_at,
+        c.updated_at
+    FROM comments c
+    INNER JOIN customers cust ON c.customer_id = cust.id
+    INNER JOIN users u ON cust.user_id = u.id
+    WHERE c.product_id = p_product_id
+    ORDER BY c.created_at DESC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_product_comments_paginated`(
+    IN p_product_id INT,
+    IN p_page INT,
+    IN p_per_page INT
+)
+BEGIN
+    DECLARE v_offset INT;
+    DECLARE v_product_exists INT;
+    
+    SET v_offset = (p_page - 1) * p_per_page;
+    
+    -- بررسی وجود محصول
+    SELECT COUNT(*) INTO v_product_exists FROM products WHERE id = p_product_id;
+    IF v_product_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+    
+    SELECT 
+        c.id as comment_id,
+        c.body,
+        c.created_at as comment_date,
+        cust.id as customer_id,
+        u.first_name,
+        u.last_name
+    FROM comments c
+    INNER JOIN customers cust ON c.customer_id = cust.id
+    INNER JOIN users u ON cust.user_id = u.id
+    WHERE c.product_id = p_product_id
+    ORDER BY c.created_at DESC
+    LIMIT p_per_page OFFSET v_offset;
+    
+    -- تعداد کل نظرات برای صفحه‌بندی
+    SELECT COUNT(*) as total_comments 
+    FROM comments 
+    WHERE product_id = p_product_id;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_purchase_history`(
+    IN p_customer_id INT
+)
+BEGIN
+    SELECT 
+        ph.id,
+        ph.product_id,
+        p.title,
+        p.value as price,
+        b.name as brand_name,
+        ph.total_amount,
+        ph.created_at as purchase_date
+    FROM purchasehistories ph
+    INNER JOIN products p ON ph.product_id = p.id
+    INNER JOIN brands b ON p.brand_id = b.id
+    WHERE ph.customer_id = p_customer_id
+    ORDER BY ph.created_at DESC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_shopping_cart`(
+    IN p_customer_id INT
+)
+BEGIN
+    SELECT 
+        o.id as order_id,
+        o.product_id,
+        p.title as product_title,
+        p.value as price,
+        p.information as product_info,
+        b.name as brand_name,
+        c.name as category_name,
+        o.created_at as added_date,
+        o.updated_at
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories cat ON p.category_id = cat.id
+    INNER JOIN customers cust ON o.customer_id = cust.id
+    INNER JOIN users u ON cust.user_id = u.id
+    WHERE o.customer_id = p_customer_id
+    ORDER BY o.created_at DESC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_shopping_cart_with_total`(
+    IN p_customer_id INT,
+    IN p_page INT,
+    IN p_per_page INT
+)
+BEGIN
+    DECLARE v_offset INT;
+    DECLARE v_customer_exists INT;
+    
+    SET v_offset = (p_page - 1) * p_per_page;
+    
+    -- بررسی وجود مشتری
+    SELECT COUNT(*) INTO v_customer_exists FROM customers WHERE id = p_customer_id;
+    IF v_customer_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'مشتری یافت نشد';
+    END IF;
+    
+    -- گرفتن محصولات سبد خرید
+    SELECT 
+        p.id,
+        p.title,
+        p.information,
+        p.value,
+        p.vehicle,
+        b.name as brand_name,
+        c.name as category_name,
+        i.path as image_path,
+        o.id as order_id,
+        o.created_at as added_date
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    LEFT JOIN images i ON p.id = i.product_id
+    WHERE o.customer_id = p_customer_id
+    ORDER BY o.created_at DESC
+    LIMIT p_per_page OFFSET v_offset;
+    
+    -- محاسبه مجموع مبلغ
+    SELECT 
+        COUNT(o.id) as items_count,
+        SUM(p.value) as total_value
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    WHERE o.customer_id = p_customer_id;
+    
+    -- تعداد کل آیتم‌ها برای صفحه‌بندی
+    SELECT COUNT(*) as total_items 
+    FROM orders 
+    WHERE customer_id = p_customer_id;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_single_product`(
+    IN p_product_id INT
+)
+BEGIN
+    DECLARE v_product_exists INT;
+    
+    SELECT 
+        p.id,
+        p.title,
+        p.information,
+        p.value,
+        p.vehicle,
+        b.name as brand_name,
+        c.name as category_name,
+        i.path as image_path,
+        a.id as admin_id,
+        u.first_name as admin_first_name,
+        u.last_name as admin_last_name,
+        p.created_at,
+        p.updated_at
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    INNER JOIN admins a ON p.admin_id = a.id
+    INNER JOIN users u ON a.user_id = u.id
+    LEFT JOIN images i ON p.id = i.product_id
+    WHERE p.id = p_product_id;
+    
+    IF FOUND_ROWS() = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_user_comments`(
+    IN p_customer_id INT
+)
+BEGIN
+    SELECT 
+        c.id,
+        c.body,
+        c.product_id,
+        p.title as product_title,
+        c.created_at,
+        c.updated_at
+    FROM comments c
+    INNER JOIN products p ON c.product_id = p.id
+    WHERE c.customer_id = p_customer_id
+    ORDER BY c.created_at DESC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_user_profile`(
+    IN p_user_id INT
+)
+BEGIN
+    DECLARE v_user_exists INT;
+    
+    -- اطلاعات کاربر
+    SELECT 
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.role,
+        p.phone,
+        p.address,
+        p.postal_code,
+        a.path as avatar_path,
+        l.last_time_login
+    FROM users u
+    LEFT JOIN profiles p ON u.id = p.user_id
+    LEFT JOIN avatars a ON u.id = a.user_id
+    LEFT JOIN logins l ON u.id = l.user_id
+    WHERE u.id = p_user_id;
+    
+    -- اگر کاربر مشتری است، اطلاعات مربوطه
+    IF EXISTS (SELECT 1 FROM customers WHERE user_id = p_user_id) THEN
+        -- نظرات کاربر
+        SELECT 
+            c.id as comment_id,
+            c.body,
+            c.product_id,
+            p.title as product_title,
+            c.created_at
+        FROM comments c
+        INNER JOIN products p ON c.product_id = p.id
+        WHERE c.customer_id = (SELECT id FROM customers WHERE user_id = p_user_id)
+        ORDER BY c.created_at DESC;
+        
+        -- محصولات خریداری شده
+        SELECT 
+            o.id as order_id,
+            p.id as product_id,
+            p.title,
+            p.value,
+            o.created_at as purchase_date
+        FROM orders o
+        INNER JOIN products p ON o.product_id = p.id
+        WHERE o.customer_id = (SELECT id FROM customers WHERE user_id = p_user_id)
+        ORDER BY o.created_at DESC;
+    END IF;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `login_user`(
+    IN p_email VARCHAR(255),
+    IN p_password VARCHAR(255)
+)
+BEGIN
+    DECLARE v_user_id INT;
+    DECLARE v_user_exists INT;
+    DECLARE v_is_banned INT;
+    
+    -- بررسی اعتبار کاربر
+    SELECT COUNT(*), id INTO v_user_exists, v_user_id
+    FROM users 
+    WHERE email = p_email AND password = p_password;
+    
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ایمیل یا رمز عبور اشتباه است';
+    END IF;
+    
+    -- بررسی بن بودن کاربر
+    SELECT COUNT(*) INTO v_is_banned FROM bans WHERE user_id = v_user_id;
+    IF v_is_banned > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'حساب کاربری شما مسدود شده است';
+    END IF;
+    
+    -- آپدیت زمان آخرین لاگین
+    UPDATE logins 
+    SET last_time_login = NOW(), 
+        updated_at = NOW() 
+    WHERE user_id = v_user_id;
+    
+    SELECT 
+        v_user_id as user_id,
+        'ورود موفقیت آمیز بود' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `process_purchase`(
+    IN p_customer_id INT
+)
+BEGIN
+    DECLARE v_customer_exists INT;
+    DECLARE v_cart_items_count INT;
+    DECLARE v_random_number INT;
+    DECLARE v_total_amount DECIMAL(12,2);
+    DECLARE v_order_id INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- بررسی وجود مشتری
+    SELECT COUNT(*) INTO v_customer_exists FROM customers WHERE id = p_customer_id;
+    IF v_customer_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'مشتری یافت نشد';
+    END IF;
+    
+    -- بررسی وجود محصولات در سبد خرید
+    SELECT COUNT(*) INTO v_cart_items_count 
+    FROM orders 
+    WHERE customer_id = p_customer_id;
+    
+    IF v_cart_items_count = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'سبد خرید شما خالی است';
+    END IF;
+    
+    -- محاسبه مجموع مبلغ سفارشات
+    SELECT SUM(p.value) INTO v_total_amount
+    FROM orders o
+    INNER JOIN products p ON o.product_id = p.id
+    WHERE o.customer_id = p_customer_id;
+    
+    -- تولید عدد تصادفی (شبیه‌سازی درگاه پرداخت)
+    SET v_random_number = FLOOR(RAND() * 101);
+    
+    -- اگر عدد زوج باشد (پرداخت موفق)
+    IF v_random_number % 2 = 0 THEN
+        -- ثبت در تاریخچه خرید
+        INSERT INTO purchasehistories (customer_id, product_id, created_at, updated_at)
+        SELECT customer_id, product_id, NOW(), NOW()
+        FROM orders 
+        WHERE customer_id = p_customer_id;
+        
+        -- محاسبه و ذخیره مجموع مبلغ
+        UPDATE purchasehistories 
+        SET total_amount = v_total_amount
+        WHERE customer_id = p_customer_id 
+        AND created_at >= NOW() - INTERVAL 1 MINUTE;
+        
+        -- حذف سفارشات از سبد خرید
+        DELETE FROM orders WHERE customer_id = p_customer_id;
+        
+        COMMIT;
+        
+        SELECT 
+            'خرید با موفقیت انجام شد' as message,
+            v_total_amount as total_amount,
+            v_random_number as random_number,
+            TRUE as success;
+    ELSE
+        -- اگر عدد فرد باشد (پرداخت ناموفق)
+        ROLLBACK;
+        
+        SELECT 
+            'ایراد در درگاه پرداخت' as message,
+            v_total_amount as total_amount,
+            v_random_number as random_number,
+            FALSE as success;
+    END IF;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `register`(
+    IN p_first_name VARCHAR(255),
+    IN p_last_name VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_password VARCHAR(255),
+    IN p_role VARCHAR(50),
+    IN p_phone VARCHAR(15),
+    IN p_address TEXT,
+    IN p_postal_code VARCHAR(10),
+    IN p_national_code VARCHAR(10),
+    IN p_information TEXT,
+    IN p_age INT
+)
+BEGIN
+    DECLARE v_user_id INT;
+    DECLARE v_customer_id INT;
+    
+    START TRANSACTION;
+    
+    IF EXISTS (SELECT 1 FROM users WHERE email = p_email) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ایمیل قبلاً ثبت شده است';
+    END IF;
+    
+    INSERT INTO users (first_name, last_name, email, password, role, created_at, updated_at)
+    VALUES (p_first_name, p_last_name, p_email, p_password, p_role, NOW(), NOW());
+    
+    SET v_user_id = LAST_INSERT_ID();
+    
+    INSERT INTO profiles (user_id, phone, address, postal_code, created_at, updated_at)
+    VALUES (v_user_id, p_phone, p_address, p_postal_code, NOW(), NOW());
+    
+    IF p_role = 'admin' THEN
+        INSERT INTO admins (user_id, national_code, information, age, created_at, updated_at)
+        VALUES (v_user_id, p_national_code, p_information, p_age, NOW(), NOW());
+    ELSE
+        INSERT INTO customers (user_id, created_at, updated_at)
+        VALUES (v_user_id, NOW(), NOW());
+        
+        SET v_customer_id = LAST_INSERT_ID();
+        
+        INSERT INTO purchasehistories (customer_id, created_at, updated_at)
+        VALUES (v_customer_id, NOW(), NOW());
+    END IF;
+    
+    COMMIT;
+    
+    SELECT 
+        v_user_id as user_id,
+        'کاربر با موفقیت ثبت شد' as message,
+        p_role as user_role;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `register_user`(
+    IN p_first_name VARCHAR(255),
+    IN p_last_name VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_password VARCHAR(255)
+)
+BEGIN
+    DECLARE v_user_id INT;
+    DECLARE v_email_exists INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- بررسی ایمیل تکراری
+    SELECT COUNT(*) INTO v_email_exists FROM users WHERE email = p_email;
+    IF v_email_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ایمیل قبلاً ثبت شده است';
+    END IF;
+    
+    -- ایجاد کاربر
+    INSERT INTO users (first_name, last_name, email, password, role, created_at, updated_at)
+    VALUES (p_first_name, p_last_name, p_email, p_password, 'customer', NOW(), NOW());
+    
+    SET v_user_id = LAST_INSERT_ID();
+    
+    -- ایجاد رکورد لاگین
+    INSERT INTO logins (user_id, last_time_login, created_at, updated_at)
+    VALUES (v_user_id, NOW(), NOW(), NOW());
+    
+    COMMIT;
+    
+    SELECT 
+        v_user_id as user_id,
+        'با موفقیت ثبت نام شدید' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `remove_from_cart`(
+    IN p_order_id INT,
+    IN p_customer_id INT
+)
+BEGIN
+    DECLARE v_order_exists INT;
+    
+    -- بررسی وجود سفارش
+    SELECT COUNT(*) INTO v_order_exists 
+    FROM orders 
+    WHERE id = p_order_id AND customer_id = p_customer_id;
+    
+    IF v_order_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'آیتم در سبد خرید یافت نشد';
+    END IF;
+    
+    -- حذف از سبد خرید
+    DELETE FROM orders WHERE id = p_order_id AND customer_id = p_customer_id;
+    
+    SELECT 'محصول از سبد خرید حذف شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `search_brands`(
+    IN p_search_term VARCHAR(255)
+)
+BEGIN
+    SELECT 
+        id,
+        name,
+        created_at,
+        updated_at
+    FROM brands 
+    WHERE name LIKE CONCAT('%', p_search_term, '%')
+    ORDER BY name ASC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `search_categories`(
+    IN p_search_term VARCHAR(255)
+)
+BEGIN
+    SELECT 
+        id,
+        name,
+        created_at,
+        updated_at
+    FROM categories 
+    WHERE name LIKE CONCAT('%', p_search_term, '%')
+    ORDER BY name ASC;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `search_products`(
+    IN p_search_term VARCHAR(255),
+    IN p_page INT,
+    IN p_per_page INT
+)
+BEGIN
+    DECLARE v_offset INT;
+    
+    SET v_offset = (p_page - 1) * p_per_page;
+    
+    SELECT 
+        p.id,
+        p.title,
+        p.information,
+        p.value,
+        p.vehicle,
+        b.name as brand_name,
+        c.name as category_name,
+        i.path as image_path
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    LEFT JOIN images i ON p.id = i.product_id
+    WHERE p.title LIKE CONCAT('%', p_search_term, '%')
+       OR p.information LIKE CONCAT('%', p_search_term, '%')
+       OR p.vehicle LIKE CONCAT('%', p_search_term, '%')
+    ORDER BY p.title ASC
+    LIMIT p_per_page OFFSET v_offset;
+    
+    -- تعداد کل نتایج
+    SELECT COUNT(*) as total_results
+    FROM products p
+    WHERE p.title LIKE CONCAT('%', p_search_term, '%')
+       OR p.information LIKE CONCAT('%', p_search_term, '%')
+       OR p.vehicle LIKE CONCAT('%', p_search_term, '%');
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `search_products_by_brand`(
+    IN p_brand_name VARCHAR(255),
+    IN p_page INT,
+    IN p_per_page INT
+)
+BEGIN
+    DECLARE v_offset INT;
+    
+    SET v_offset = (p_page - 1) * p_per_page;
+    
+    SELECT 
+        p.id,
+        p.title,
+        p.information,
+        p.value,
+        p.vehicle,
+        b.name as brand_name,
+        c.name as category_name,
+        i.path as image_path
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    LEFT JOIN images i ON p.id = i.product_id
+    WHERE b.name LIKE CONCAT('%', p_brand_name, '%')
+    ORDER BY p.title ASC
+    LIMIT p_per_page OFFSET v_offset;
+    
+    SELECT COUNT(*) as total_results
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    WHERE b.name LIKE CONCAT('%', p_brand_name, '%');
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `search_products_by_category`(
+    IN p_category_name VARCHAR(255),
+    IN p_page INT,
+    IN p_per_page INT
+)
+BEGIN
+    DECLARE v_offset INT;
+    
+    SET v_offset = (p_page - 1) * p_per_page;
+    
+    SELECT 
+        p.id,
+        p.title,
+        p.information,
+        p.value,
+        p.vehicle,
+        b.name as brand_name,
+        c.name as category_name,
+        i.path as image_path
+    FROM products p
+    INNER JOIN brands b ON p.brand_id = b.id
+    INNER JOIN categories c ON p.category_id = c.id
+    LEFT JOIN images i ON p.id = i.product_id
+    WHERE c.name LIKE CONCAT('%', p_category_name, '%')
+    ORDER BY p.title ASC
+    LIMIT p_per_page OFFSET v_offset;
+    
+    SELECT COUNT(*) as total_results
+    FROM products p
+    INNER JOIN categories c ON p.category_id = c.id
+    WHERE c.name LIKE CONCAT('%', p_category_name, '%');
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `set_product_image`(
+    IN p_product_id INT,
+    IN p_image_path VARCHAR(500)
+)
+BEGIN
+    DECLARE v_product_exists INT;
+    DECLARE v_old_image_path VARCHAR(500);
+    
+    -- بررسی وجود محصول
+    SELECT COUNT(*) INTO v_product_exists FROM products WHERE id = p_product_id;
+    IF v_product_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محصول یافت نشد';
+    END IF;
+    
+    -- بررسی وجود تصویر قبلی
+    SELECT path INTO v_old_image_path FROM images WHERE product_id = p_product_id;
+    
+    -- آپدیت یا ایجاد تصویر جدید
+    IF EXISTS (SELECT 1 FROM images WHERE product_id = p_product_id) THEN
+        UPDATE images 
+        SET path = p_image_path, 
+            updated_at = NOW() 
+        WHERE product_id = p_product_id;
+    ELSE
+        INSERT INTO images (product_id, path, created_at, updated_at)
+        VALUES (p_product_id, p_image_path, NOW(), NOW());
+    END IF;
+    
+    SELECT 
+        'تصویر محصول با موفقیت تنظیم شد' as message,
+        COALESCE(v_old_image_path, '') as old_image_path;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `set_user_avatar`(
+    IN p_user_id INT,
+    IN p_avatar_path VARCHAR(500)
+)
+BEGIN
+    DECLARE v_user_exists INT;
+    DECLARE v_old_avatar_path VARCHAR(500);
+    
+    -- بررسی وجود کاربر
+    SELECT COUNT(*) INTO v_user_exists FROM users WHERE id = p_user_id;
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر یافت نشد';
+    END IF;
+    
+    -- گرفتن مسیر آواتار قبلی
+    SELECT path INTO v_old_avatar_path FROM avatars WHERE user_id = p_user_id;
+    
+    -- آپدیت یا ایجاد آواتار
+    IF EXISTS (SELECT 1 FROM avatars WHERE user_id = p_user_id) THEN
+        UPDATE avatars 
+        SET path = p_avatar_path, 
+            updated_at = NOW() 
+        WHERE user_id = p_user_id;
+    ELSE
+        INSERT INTO avatars (user_id, path, created_at, updated_at)
+        VALUES (p_user_id, p_avatar_path, NOW(), NOW());
+    END IF;
+    
+    SELECT 
+        'آواتار با موفقیت آپلود شد' as message,
+        COALESCE(v_old_avatar_path, '') as old_avatar_path;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `unban_user`(
+    IN p_user_id INT
+)
+BEGIN
+    DECLARE v_banned_user INT;
+    
+    -- بررسی بن بودن کاربر
+    SELECT COUNT(*) INTO v_banned_user FROM bans WHERE user_id = p_user_id;
+    IF v_banned_user = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر بن نشده است';
+    END IF;
+    
+    -- آنبن کردن
+    DELETE FROM bans WHERE user_id = p_user_id;
+    
+    SELECT 'کاربر با موفقیت آنبن شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_admin_information`(
+    IN p_admin_id INT,
+    IN p_information TEXT
+)
+BEGIN
+    DECLARE v_admin_exists INT;
+    
+    -- بررسی وجود ادمین
+    SELECT COUNT(*) INTO v_admin_exists FROM admins WHERE id = p_admin_id;
+    IF v_admin_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ادمین یافت نشد';
+    END IF;
+    
+    -- آپدیت اطلاعات
+    UPDATE admins 
+    SET information = p_information, 
+        updated_at = NOW() 
+    WHERE id = p_admin_id;
+    
+    SELECT 'اطلاعات ادمین با موفقیت بروزرسانی شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_brand`(
+    IN p_brand_id INT,
+    IN p_name VARCHAR(255)
+)
+BEGIN
+    DECLARE v_brand_exists INT;
+    DECLARE v_name_exists INT;
+    
+    -- بررسی وجود برند
+    SELECT COUNT(*) INTO v_brand_exists FROM brands WHERE id = p_brand_id;
+    IF v_brand_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'برند یافت نشد';
+    END IF;
+    
+    -- بررسی نام تکراری (به جز خود برند)
+    SELECT COUNT(*) INTO v_name_exists FROM brands WHERE name = p_name AND id != p_brand_id;
+    IF v_name_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'نام برند قبلاً توسط برند دیگری استفاده شده است';
+    END IF;
+    
+    -- آپدیت برند
+    UPDATE brands 
+    SET name = p_name, 
+        updated_at = NOW() 
+    WHERE id = p_brand_id;
+    
+    SELECT 'تغییرات با موفقیت ثبت شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_category`(
+    IN p_category_id INT,
+    IN p_name VARCHAR(255)
+)
+BEGIN
+    DECLARE v_category_exists INT;
+    DECLARE v_name_exists INT;
+    
+    -- بررسی وجود دسته‌بندی
+    SELECT COUNT(*) INTO v_category_exists FROM categories WHERE id = p_category_id;
+    IF v_category_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'دسته‌بندی یافت نشد';
+    END IF;
+    
+    -- بررسی نام تکراری (به جز خود دسته‌بندی)
+    SELECT COUNT(*) INTO v_name_exists FROM categories WHERE name = p_name AND id != p_category_id;
+    IF v_name_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'نام دسته‌بندی قبلاً توسط دسته‌بندی دیگری استفاده شده است';
+    END IF;
+    
+    -- آپدیت دسته‌بندی
+    UPDATE categories 
+    SET name = p_name, 
+        updated_at = NOW() 
+    WHERE id = p_category_id;
+    
+    SELECT 'تغییرات با موفقیت ثبت شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_comment`(
+    IN p_comment_id INT,
+    IN p_body TEXT
+)
+BEGIN
+    DECLARE v_comment_exists INT;
+    DECLARE v_product_id INT;
+    
+    -- بررسی وجود نظر
+    SELECT COUNT(*), product_id INTO v_comment_exists, v_product_id 
+    FROM comments WHERE id = p_comment_id;
+    
+    IF v_comment_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'نظر یافت نشد';
+    END IF;
+    
+    -- بررسی محتوای نامناسب
+    IF (LOWER(p_body) LIKE '%fuck%' OR 
+        LOWER(p_body) LIKE '%boobs%' OR 
+        LOWER(p_body) LIKE '%dick%' OR 
+        LOWER(p_body) LIKE '%shit%' OR 
+        LOWER(p_body) LIKE '%asshole%') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'محتوای نظر شامل کلمات نامناسب است';
+    END IF;
+    
+    -- بررسی طول نظر
+    IF LENGTH(p_body) > 50 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'طول نظر نمی‌تواند بیشتر از 50 کاراکتر باشد';
+    END IF;
+    
+    -- آپدیت نظر
+    UPDATE comments 
+    SET body = p_body, 
+        updated_at = NOW() 
+    WHERE id = p_comment_id;
+    
+    SELECT 
+        v_product_id as product_id,
+        'نظر شما با موفقیت بروزرسانی شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_order_quantity`(
+    IN p_order_id INT,
+    IN p_quantity INT
+)
+BEGIN
+    DECLARE v_order_exists INT;
+    
+    -- بررسی وجود سفارش
+    SELECT COUNT(*) INTO v_order_exists FROM orders WHERE id = p_order_id;
+    IF v_order_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'سفارش یافت نشد';
+    END IF;
+    
+    -- در این مدل ساده، quantity نداریم ولی برای توسعه آینده می‌توان اضافه کرد
+    -- فعلاً فقط updated_at را آپدیت می‌کنیم
+    UPDATE orders 
+    SET updated_at = NOW() 
+    WHERE id = p_order_id;
+    
+    SELECT 'سبد خرید بروزرسانی شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_user_information`(
+    IN p_user_id INT,
+    IN p_first_name VARCHAR(255),
+    IN p_last_name VARCHAR(255),
+    IN p_address TEXT,
+    IN p_postal_code VARCHAR(10)
+)
+BEGIN
+    DECLARE v_user_exists INT;
+    DECLARE v_profile_exists INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- بررسی وجود کاربر
+    SELECT COUNT(*) INTO v_user_exists FROM users WHERE id = p_user_id;
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'کاربر یافت نشد';
+    END IF;
+    
+    -- آپدیت اطلاعات کاربر
+    UPDATE users 
+    SET first_name = p_first_name,
+        last_name = p_last_name,
+        updated_at = NOW()
+    WHERE id = p_user_id;
+    
+    -- آپدیت پروفایل
+    SELECT COUNT(*) INTO v_profile_exists FROM profiles WHERE user_id = p_user_id;
+    IF v_profile_exists > 0 THEN
+        UPDATE profiles 
+        SET address = p_address,
+            postal_code = p_postal_code,
+            updated_at = NOW()
+        WHERE user_id = p_user_id;
+    END IF;
+    
+    COMMIT;
+    
+    SELECT 'تغییرات با موفقیت اعمال شد' as message;
+END
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+

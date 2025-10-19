@@ -9,10 +9,7 @@
                     </div>
                 </div>
                 <h1 class="results-title">نتایج جست‌وجو</h1>
-                <p class="results-subtitle">
-                    <i class="fas fa-search me-2"></i>
-                    جست‌وجو برای: "<span class="search-term">{{ request('term') }}</span>"
-                </p>
+
                 
                 <!-- آمار نتایج -->
                 <div class="results-stats">
